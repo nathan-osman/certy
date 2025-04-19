@@ -6,6 +6,7 @@ import (
 	"os/signal"
 	"syscall"
 
+	"github.com/nathan-osman/certy/server"
 	"github.com/nathan-osman/certy/storage"
 	"github.com/urfave/cli/v2"
 )
@@ -20,6 +21,12 @@ func main() {
 				EnvVars: []string{"DATA_DIR"},
 				Usage:   "path to data directory",
 			},
+			&cli.StringFlag{
+				Name:    "server-addr",
+				Value:   ":80",
+				EnvVars: []string{"SERVER_ADDR"},
+				Usage:   "HTTP address to listen on",
+			},
 		},
 		Action: func(c *cli.Context) error {
 
@@ -29,8 +36,8 @@ func main() {
 				return err
 			}
 
-			// TODO
-			_ = s
+			// Start the server
+			defer server.New(c.String("server-addr"), s).Close()
 
 			// Wait for SIGINT or SIGTERM
 			sigChan := make(chan os.Signal, 1)

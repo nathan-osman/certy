@@ -2,6 +2,7 @@ package storage
 
 import (
 	"crypto/x509"
+	"path/filepath"
 	"sync"
 
 	"github.com/rs/zerolog"
@@ -9,7 +10,7 @@ import (
 )
 
 // Internally, the directory structure looks something like this:
-// - ca/
+// - cas/
 //   - [UUID]/
 //     - cert.pem
 //     - key.pem
@@ -29,7 +30,7 @@ type Storage struct {
 func New(dataDir string) (*Storage, error) {
 	s := &Storage{
 		logger:  log.With().Str("package", "storage").Logger(),
-		dataDir: dataDir,
+		dataDir: filepath.Join("cas", dataDir),
 	}
 	certs, err := s.loadCAs()
 	if err != nil {

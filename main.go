@@ -6,6 +6,7 @@ import (
 	"os/signal"
 	"syscall"
 
+	"github.com/nathan-osman/certy/storage"
 	"github.com/urfave/cli/v2"
 )
 
@@ -13,10 +14,23 @@ func main() {
 	app := &cli.App{
 		Name:  "certy",
 		Usage: "Simple web-based certificate authority",
-		Flags: []cli.Flag{},
+		Flags: []cli.Flag{
+			&cli.StringFlag{
+				Name:    "data-dir",
+				EnvVars: []string{"DATA_DIR"},
+				Usage:   "path to data directory",
+			},
+		},
 		Action: func(c *cli.Context) error {
 
-			//...
+			// Create the storage instance
+			s, err := storage.New(c.String("data-dir"))
+			if err != nil {
+				return err
+			}
+
+			// TODO
+			_ = s
 
 			// Wait for SIGINT or SIGTERM
 			sigChan := make(chan os.Signal, 1)

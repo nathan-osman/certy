@@ -18,6 +18,9 @@ func (s *Storage) loadCA(dir string) (*x509.Certificate, error) {
 func (s *Storage) loadCAs() (map[string]*x509.Certificate, error) {
 	entries, err := os.ReadDir(s.dataDir)
 	if err != nil {
+		if os.IsNotExist(err) {
+			return map[string]*x509.Certificate{}, nil
+		}
 		return nil, err
 	}
 	certs := map[string]*x509.Certificate{}

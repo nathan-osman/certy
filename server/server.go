@@ -2,9 +2,12 @@ package server
 
 import (
 	"context"
+	"embed"
 	"errors"
 	"net/http"
+	"path"
 
+	"github.com/gin-contrib/static"
 	"github.com/gin-gonic/gin"
 	"github.com/nathan-osman/certy/storage"
 	"github.com/rs/zerolog"
@@ -17,6 +20,24 @@ type Server struct {
 	server  http.Server
 	logger  zerolog.Logger
 	storage *storage.Storage
+}
+
+var (
+	//go:embed static/*
+	staticFS embed.FS
+)
+
+type embedFileSystem struct {
+	http.FileSystem
+}
+
+func (e embedFileSystem) Exists(prefix, filepath string) bool {
+	f, err := e.Open(path.Join(prefix, filepath))
+	if err != nil {
+		return false
+	}
+	f.Close()
+	return true
 }
 
 // New create a new Server instance.
@@ -32,6 +53,12 @@ func New(addr string, st *storage.Storage) *Server {
 			storage: st,
 		}
 	)
+
+	// The home page
+	r.GET("/", s.index)
+
+	// Static files
+	r.Use(static.Serve("/", embedFileSystem{http.FS(staticFS)}))
 
 	// Listen for connections in a separate goroutine
 	go func() {

@@ -53,9 +53,10 @@ func (s *Storage) ListCAs() []*x509.Certificate {
 
 // CreateCAParams provides CreateCA with parameters for the new CA.
 type CreateCAParams struct {
-	Organization  string        `json:"organization"`
-	Validity      time.Duration `json:"validity"`
-	UsageCertSign bool          `json:"usage_cert_sign"`
+	CommonName    string        `form:"common_name"`
+	Organization  string        `form:"organization"`
+	Validity      time.Duration `form:"validity"`
+	UsageCertSign bool          `form:"usage_cert_sign"`
 }
 
 // TODO: delete the intermediate files if something fails in this method
@@ -79,6 +80,7 @@ func (s *Storage) CreateCA(params *CreateCAParams) error {
 		c = &x509.Certificate{
 			SerialNumber: big.NewInt(1),
 			Subject: pkix.Name{
+				CommonName:   params.CommonName,
 				Organization: []string{params.Organization},
 			},
 			NotBefore:             n,

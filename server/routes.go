@@ -3,9 +3,10 @@ package server
 import (
 	"embed"
 	"html/template"
-	"time"
+	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/nathan-osman/certy/storage"
 )
 
 var (
@@ -25,6 +26,21 @@ func render(c *gin.Context, name string, data any) {
 
 func (s *Server) index(c *gin.Context) {
 	render(c, "templates/index.html", gin.H{
-		"Year": time.Now().Year(),
+		"Certificates": s.storage.ListCAs(),
 	})
+}
+
+func (s *Server) newCAGET(c *gin.Context) {
+	render(c, "templates/new_ca.html", gin.H{})
+}
+
+func (s *Server) newCAPOST(c *gin.Context) {
+	params := &storage.CreateCAParams{}
+	if err := c.ShouldBind(params); err != nil {
+		panic(err)
+	}
+	if err := s.storage.CreateCA(params); err != nil {
+		panic(err)
+	}
+	c.Redirect(http.StatusFound, "/")
 }

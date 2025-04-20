@@ -1,3 +1,9 @@
 {{define "content"}}
-Hello, world!
+<p>CAs currently registered:</p>
+<ul>
+  {{range .Certificates}}
+    <li>{{.Subject.CommonName}}</li>
+  {{end}}
+</ul>
+<a href="/new">[create new]</a>
 {{end}}

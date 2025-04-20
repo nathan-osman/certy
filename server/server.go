@@ -54,8 +54,10 @@ func New(addr string, st *storage.Storage) *Server {
 		}
 	)
 
-	// The home page
+	// Interface pages
 	r.GET("/", s.index)
+	r.GET("/new", s.newCAGET)
+	r.POST("/new", s.newCAPOST)
 
 	// Static files
 	r.Use(static.Serve("/", embedFileSystem{http.FS(staticFS)}))

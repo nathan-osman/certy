@@ -55,6 +55,7 @@ func (s *Storage) ListCAs() []*x509.Certificate {
 type CreateCAParams struct {
 	CommonName    string        `form:"common_name"`
 	Organization  string        `form:"organization"`
+	Country       string        `form:"country"`
 	Validity      time.Duration `form:"validity"`
 	UsageCertSign bool          `form:"usage_cert_sign"`
 }
@@ -82,6 +83,7 @@ func (s *Storage) CreateCA(params *CreateCAParams) error {
 			Subject: pkix.Name{
 				CommonName:   params.CommonName,
 				Organization: []string{params.Organization},
+				Country:      []string{params.Country},
 			},
 			NotBefore:             n,
 			NotAfter:              n.Add(params.Validity),

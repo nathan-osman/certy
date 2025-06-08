@@ -23,8 +23,18 @@ a:hover {
   color: var(--color2);
 }
 
+input {
+  border: 2px solid var(--color3);
+  padding: 8px;
+}
+
+input, .button {
+  font-size: 12pt;
+}
+
 label {
   display: block;
+  margin: 8px 0;
 }
 
 .container {
@@ -33,6 +43,7 @@ label {
 
 .button {
   background-color: var(--color3);
+  border: none;
   color: var(--color1);
   cursor: pointer;
   display: inline-block;
@@ -43,6 +54,10 @@ label {
 .button:hover {
   background-color: var(--color2);
   color: var(--color1);
+}
+
+.buttons {
+  margin: 16px 0;
 }
 
 .header {

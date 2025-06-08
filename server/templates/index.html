@@ -1,5 +1,5 @@
 {{define "content"}}
-<div class="heading">CAs Currently Registered</div>
+<div class="heading">Root CAs Currently Registered</div>
 <table class="table">
   <thead>
     <tr>
@@ -11,12 +11,16 @@
   <tbody>
     {{range .Certificates}}
       <tr>
-        <td>{{.Subject.CommonName}}</td>
+        <td>
+          <a href="#">{{.Subject.CommonName}}</a>
+        </td>
         <td>{{.NotBefore}}</td>
         <td>{{.NotAfter}}</td>
       </tr>
     {{end}}
   </tbody>
 </table>
-<a href="/new" class="button">Create New</a>
+<div class="buttons">
+  <a href="/new" class="button">Create New</a>
+</div>
 {{end}}

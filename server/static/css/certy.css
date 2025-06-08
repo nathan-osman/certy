@@ -2,6 +2,96 @@
   box-sizing: border-box;
 }
 
+:root {
+  --color1: #f5eedc;
+  --color2: #27548A;
+  --color3: #183b4e;
+  --color4: #dda853;
+}
+
+body {
+  background-color: var(--color1);
+  font-family: sans-serif;
+  margin: 0;
+}
+
+a {
+  color: var(--color3);
+}
+
+a:hover {
+  color: var(--color2);
+}
+
 label {
   display: block;
+}
+
+.container {
+  margin: auto 12px;
+}
+
+.button {
+  background-color: var(--color3);
+  color: var(--color1);
+  cursor: pointer;
+  display: inline-block;
+  padding: 8px 16px;
+  text-decoration: none;
+}
+
+.button:hover {
+  background-color: var(--color2);
+  color: var(--color1);
+}
+
+.header {
+  background-color: var(--color3);
+  margin-bottom: 32px;
+  padding: 16px 0;
+}
+
+.header .title {
+  font-size: 24pt;
+}
+
+.header .title a {
+  color: var(--color1);
+  text-decoration: none;
+}
+
+.header .title a:hover {
+  text-decoration: underline;
+}
+
+.heading {
+  font-size: 18pt;
+  margin-bottom: 16px;
+}
+
+.table {
+  border-collapse: collapse;
+  margin: 16px 0;
+  width: 100%;
+}
+
+.table thead tr {
+  background-color: var(--color3);
+  color: var(--color1);
+}
+
+.table thead tr th {
+  text-align: left;
+}
+
+.table th, .table td {
+  border: 2px solid var(--color3);
+  padding: 4px 8px;
+}
+
+@media (min-width: 800px) {
+  .container {
+    margin: auto;
+    width: 720px;
+  }
 }

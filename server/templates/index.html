@@ -1,9 +1,22 @@
 {{define "content"}}
-<p>CAs currently registered:</p>
-<ul>
-  {{range .Certificates}}
-    <li>{{.Subject.CommonName}}</li>
-  {{end}}
-</ul>
-<a href="/new">[create new]</a>
+<div class="heading">CAs Currently Registered</div>
+<table class="table">
+  <thead>
+    <tr>
+      <th>Common Name</th>
+      <th>Issued</th>
+      <th>Expires</th>
+    </tr>
+  </thead>
+  <tbody>
+    {{range .Certificates}}
+      <tr>
+        <td>{{.Subject.CommonName}}</td>
+        <td>{{.NotBefore}}</td>
+        <td>{{.NotAfter}}</td>
+      </tr>
+    {{end}}
+  </tbody>
+</table>
+<a href="/new" class="button">Create New</a>
 {{end}}

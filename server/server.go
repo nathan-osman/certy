@@ -25,6 +25,7 @@ var (
 )
 
 func init() {
+	pongo2.RegisterFilter("formatBytes", formatBytes)
 	pongo2.RegisterFilter("formatDate", formatDate)
 }
 

@@ -88,12 +88,11 @@ label {
 .table {
   border-collapse: collapse;
   margin: 16px 0;
-  width: 100%;
 }
 
-.table thead tr {
-  background-color: var(--color3);
-  color: var(--color1);
+.table .empty {
+  padding: 32px 0;
+  text-align: center;
 }
 
 .table th {
@@ -101,8 +100,20 @@ label {
 }
 
 .table th, .table td {
-  border: 2px solid var(--color3);
   padding: 4px 8px;
+}
+
+.table.bordered {
+  width: 100%;
+}
+
+.table.bordered thead tr {
+  background-color: var(--color3);
+  color: var(--color1);
+}
+
+.table.bordered th, .table.bordered td {
+  border: 2px solid var(--color3);
 }
 
 @media (min-width: 800px) {

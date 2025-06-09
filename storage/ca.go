@@ -107,7 +107,7 @@ func parseValidity(n time.Time, validity string) (time.Time, error) {
 // maybe using defer?
 
 // CreateCA creates a new CA on disk using the provided data.
-func (s *Storage) CreateCA(params *CreateCAParams) error {
+func (s *Storage) CreateCA(params *CreateCAParams) (string, error) {
 	var (
 		n    = time.Now()
 		uuid = uuid.New().String()
@@ -115,14 +115,14 @@ func (s *Storage) CreateCA(params *CreateCAParams) error {
 	)
 	v, err := parseValidity(n, params.Validity)
 	if err != nil {
-		return err
+		return "", err
 	}
 	if err := os.MkdirAll(dir, 0700); err != nil {
-		return err
+		return "", err
 	}
 	p, err := generatePrivateKey(filepath.Join(dir, "key.pem"))
 	if err != nil {
-		return err
+		return "", err
 	}
 	var (
 		c = &x509.Certificate{
@@ -140,14 +140,24 @@ func (s *Storage) CreateCA(params *CreateCAParams) error {
 	)
 	s.mutex.Lock()
 	defer s.mutex.Unlock()
+
+	// Create the certificate
 	if err := createCertificate(
 		filepath.Join(dir, "cert.pem"),
 		c, c, p,
 	); err != nil {
-		return err
+		return "", err
 	}
-	s.cas[uuid] = c
-	return nil
+
+	// Not sure why, but we need to reload from disk otherwise certain fields
+	// aren't set correctly
+	newCert, err := s.loadCA(uuid)
+	if err != nil {
+		return "", err
+	}
+	s.cas[uuid] = newCert
+
+	return uuid, nil
 }
 
 // LoadCA attempts to load the provided certificate.

@@ -4,27 +4,31 @@
 
 {% block content %}
 <div class="heading">{{ certificate.Subject.CommonName }}</div>
-<table>
+<table class="table bordered">
   <tbody>
     <tr>
       <th>Version:</th>
       <td>{{ certificate.Version }}</td>
     </tr>
     <tr>
+      <th>Serial Number:</th>
+      <td>{{ certificate.SerialNumber }}</td>
+    </tr>
+    <tr>
+      <th>Signature Algorithm:</th>
+      <td>{{ certificate.SignatureAlgorithm }}</td>
+    </tr>
+    <tr>
       <th>Not Before:</th>
-      <td>{{ certificate.NotBefore }}</td>
+      <td>{{ certificate.NotBefore | formatDate }}</td>
     </tr>
     <tr>
       <th>Not After:</th>
-      <td>{{ certificate.NotAfter }}</td>
-    </tr>
-    <tr>
-      <th>Key Usage:</th>
-      <td>{{ certificate.KeyUsage }}</td>
+      <td>{{ certificate.NotAfter | formatDate }}</td>
     </tr>
     <tr>
       <th>Subject Key ID:</th>
-      <td>{{ certificate.SubjectKeyId }}</td>
+      <td>{{ certificate.SubjectKeyId | formatBytes }}</td>
     </tr>
   </tbody>
 </table>

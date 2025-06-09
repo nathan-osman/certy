@@ -1,6 +1,7 @@
 package server
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/flosch/pongo2/v6"
@@ -23,10 +24,11 @@ func (s *Server) newCAPOST(c *gin.Context) {
 	if err := c.ShouldBind(params); err != nil {
 		panic(err)
 	}
-	if err := s.storage.CreateCA(params); err != nil {
+	u, err := s.storage.CreateCA(params)
+	if err != nil {
 		panic(err)
 	}
-	c.Redirect(http.StatusFound, "/")
+	c.Redirect(http.StatusFound, fmt.Sprintf("/%s", u))
 }
 
 func (s *Server) viewCAGET(c *gin.Context) {

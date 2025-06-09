@@ -4,4 +4,14 @@
 
 {% block content %}
 <div class="heading">New Certificate for {{ certificate.Subject.CommonName }}</div>
+<form method="post">
+  <label>
+    Common name:
+    <input type="text" name="common_name" />
+  </label>
+  {% include "templates/fragments/validity.html" %}
+  <div class="buttons">
+    <button type="submit" class="button">Create</button>
+  </div>
+</form>
 {% endblock %}

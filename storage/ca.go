@@ -95,27 +95,28 @@ func (s *Storage) CreateCA(params *CreateCAParams) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	var (
-		c = &x509.Certificate{
-			SerialNumber: big.NewInt(1),
-			Subject: pkix.Name{
-				CommonName:   params.CommonName,
-				Organization: []string{params.Organization},
-				Country:      []string{params.Country},
-			},
-			NotBefore:             n,
-			NotAfter:              v,
-			BasicConstraintsValid: true,
-			IsCA:                  true,
-		}
-	)
+	c := &x509.Certificate{
+		SerialNumber: big.NewInt(1),
+		Subject: pkix.Name{
+			CommonName:   params.CommonName,
+			Organization: []string{params.Organization},
+			Country:      []string{params.Country},
+		},
+		NotBefore:             n,
+		NotAfter:              v,
+		BasicConstraintsValid: true,
+		IsCA:                  true,
+	}
 	s.mutex.Lock()
 	defer s.mutex.Unlock()
 
 	// Create the certificate
 	if err := createCertificate(
 		filepath.Join(dir, "cert.pem"),
-		c, c, p,
+		c,
+		c, // parent is same as template since self-signed
+		&p.PublicKey,
+		p,
 	); err != nil {
 		return "", err
 	}
@@ -140,4 +141,62 @@ func (s *Storage) LoadCA(name string) (*x509.Certificate, error) {
 		return nil, errors.New("no such certificate")
 	}
 	return c, nil
+}
+
+// CreateCertParams provides CreateCert with parameters for the new certificate.
+type CreateCertParams struct {
+	CommonName string `form:"common_name"`
+	Validity   string `form:"validity"`
+}
+
+// TODO: serial needs to be incremented!!
+
+// CreateCert creates a new certificate on disk using the provided parent.
+func (s *Storage) CreateCert(parent string, params *CreateCertParams) (string, error) {
+	var (
+		n         = time.Now()
+		uuid      = uuid.New().String()
+		parentDir = filepath.Join(s.dataDir, parent)
+		dir       = filepath.Join(parentDir, uuid)
+	)
+	v, err := parseValidity(n, params.Validity)
+	if err != nil {
+		return "", err
+	}
+	if err := os.MkdirAll(dir, 0700); err != nil {
+		return "", err
+	}
+	p, err := generatePrivateKey(filepath.Join(dir, "key.pem"))
+	if err != nil {
+		return "", err
+	}
+	c := &x509.Certificate{
+		SerialNumber: big.NewInt(1),
+		Subject: pkix.Name{
+			CommonName: params.CommonName,
+		},
+		NotBefore: n,
+		NotAfter:  v,
+	}
+	s.mutex.Lock()
+	defer s.mutex.Unlock()
+
+	// Load the parent's private key
+	k, err := loadPrivateKey(filepath.Join(parentDir, "key.pem"))
+	if err != nil {
+		return "", err
+	}
+
+	// Create the certificate
+	if err := createCertificate(
+		filepath.Join(dir, "cert.pem"),
+		c,
+		s.cas[parent],
+		&p.PublicKey,
+		k,
+	); err != nil {
+		return "", err
+	}
+
+	return uuid, nil
 }

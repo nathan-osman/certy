@@ -88,8 +88,8 @@ func New(addr string, st *storage.Storage) (*Server, error) {
 			c.Next()
 		})
 		groupCA.GET("", s.viewCAGET)
-		groupCA.GET("/new", s.caNewGET)
-		groupCA.POST("/new", s.caNewPOST)
+		groupCA.GET("/new", s.caNewCertGET)
+		groupCA.POST("/new", s.caNewCertPOST)
 	}
 
 	// Static files

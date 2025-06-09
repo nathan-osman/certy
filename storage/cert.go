@@ -28,14 +28,15 @@ func loadCertificate(filename string) (*x509.Certificate, error) {
 func createCertificate(
 	filename string,
 	template, parent *x509.Certificate,
-	key *rsa.PrivateKey,
+	publicKey *rsa.PublicKey,
+	privateKey *rsa.PrivateKey,
 ) error {
 	c, err := x509.CreateCertificate(
 		rand.Reader,
 		template,
 		parent,
-		&key.PublicKey,
-		key,
+		publicKey,
+		privateKey,
 	)
 	if err != nil {
 		return err

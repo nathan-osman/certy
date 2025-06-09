@@ -50,13 +50,28 @@ func (s *Server) viewCAGET(c *gin.Context) {
 	})
 }
 
-func (s *Server) caNewGET(c *gin.Context) {
+func (s *Server) caNewCertGET(c *gin.Context) {
 	c.HTML(http.StatusOK, "templates/new_cert.html", pongo2.Context{
 		"name":        c.GetString(contextCAName),
 		"certificate": certFromContext(c, contextCACert),
 	})
 }
 
-func (s *Server) caNewPOST(c *gin.Context) {
-	//...
+func (s *Server) caNewCertPOST(c *gin.Context) {
+	var (
+		parentName = c.GetString(contextCAName)
+		params     = &storage.CreateCertParams{}
+	)
+	if err := c.ShouldBind(params); err != nil {
+		panic(err)
+	}
+	u, err := s.storage.CreateCert(parentName, params)
+	if err != nil {
+		panic(err)
+	}
+	c.Redirect(http.StatusFound, fmt.Sprintf(
+		"/%s/%s",
+		parentName,
+		u,
+	))
 }

@@ -9,6 +9,18 @@ import (
 	"github.com/nathan-osman/certy/storage"
 )
 
+func (s *Server) errorHandler(c *gin.Context, err any) {
+	msg := "an unknown error has occurred"
+	switch v := err.(type) {
+	case error:
+		msg = v.Error()
+	}
+	c.HTML(http.StatusInternalServerError, "templates/error.html", pongo2.Context{
+		"msg": msg,
+	})
+	c.Abort()
+}
+
 func (s *Server) index(c *gin.Context) {
 	c.HTML(http.StatusOK, "templates/index.html", pongo2.Context{
 		"entries": s.storage.ListCAs(),

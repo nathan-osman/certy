@@ -6,6 +6,7 @@
   --color1: #f5eedc;
   --color2: #27548A;
   --color3: #183b4e;
+  --colorRed: #a02020;
 }
 
 body {
@@ -60,6 +61,10 @@ label {
   display: flex;
   column-gap: 4px;
   margin: 16px 0;
+}
+
+.error {
+  color: var(--colorRed);
 }
 
 .header {

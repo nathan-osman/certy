@@ -1,0 +1,14 @@
+{% extends "templates/base.html" %}
+
+{% block title %}Error{% endblock %}
+
+{% block content %}
+<div class="heading">Something went wrong!</div>
+<p>
+  We're so sorry, but we encountered an error while trying to render this page.
+</p>
+<p class="error">
+  <strong>Error:</strong>
+  {{ msg }}
+</p>
+{% endblock %}

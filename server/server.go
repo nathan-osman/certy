@@ -66,6 +66,9 @@ func New(addr string, st *storage.Storage) (*Server, error) {
 		TemplateSet: tmplSet,
 	})
 
+	// Handle errors gracefully
+	r.Use(gin.CustomRecovery(s.errorHandler))
+
 	// Interface pages
 
 	r.GET("/", s.index)

@@ -6,7 +6,6 @@
   --color1: #f5eedc;
   --color2: #27548A;
   --color3: #183b4e;
-  --color4: #dda853;
 }
 
 body {
@@ -113,7 +112,8 @@ label {
 }
 
 .table.bordered th, .table.bordered td {
-  border: 2px solid var(--color3);
+  border-bottom: 2px solid var(--color3);
+  border-top: 2px solid var(--color3);
 }
 
 @media (min-width: 800px) {

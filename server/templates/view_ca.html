@@ -5,6 +5,12 @@
 {% block content %}
 <div class="heading">{{ certificate.Subject.CommonName }}</div>
 <table class="table bordered">
+  <thead>
+    <tr>
+      <th>Property</th>
+      <th>Value</th>
+    </tr>
+  </thead>
   <tbody>
     <tr>
       <th>Version:</th>
@@ -32,4 +38,10 @@
     </tr>
   </tbody>
 </table>
+<div class="heading">Certificates</div>
+{% import 'templates/macros/entries.html' entry_table %}
+{{ entry_table("/" + name + "/", entries) }}
+<div class="buttons">
+  <a href="/{{ name }}/new" class="button">Create New</a>
+</div>
 {% endblock %}

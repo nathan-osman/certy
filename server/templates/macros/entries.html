@@ -1,0 +1,29 @@
+{# Display a table of entries (name+certificates) #}
+{% macro entry_table(prefix, entries) export %}
+  <table class="table bordered">
+    <thead>
+      <tr>
+        <th>Common Name</th>
+        <th>Issued</th>
+        <th>Expires</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for e in entries %}
+        <tr>
+          <td>
+            <a href="{{ prefix }}{{ e.Name }}">
+              {{ e.Certificate.Subject.CommonName}}
+            </a>
+          </td>
+          <td>{{ e.Certificate.NotBefore | formatDate }}</td>
+          <td>{{ e.Certificate.NotAfter | formatDate }}</td>
+        </tr>
+      {% empty %}
+        <tr>
+          <td colspan="3" class="empty">No certificates!</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% endmacro %}

@@ -1,0 +1,31 @@
+{% extends "templates/base.html" %}
+
+{% block title %}{{ certificate.Subject.CommonName }}{% endblock %}
+
+{% block content %}
+<div class="heading">{{ certificate.Subject.CommonName }}</div>
+<table>
+  <tbody>
+    <tr>
+      <th>Version:</th>
+      <td>{{ certificate.Version }}</td>
+    </tr>
+    <tr>
+      <th>Not Before:</th>
+      <td>{{ certificate.NotBefore }}</td>
+    </tr>
+    <tr>
+      <th>Not After:</th>
+      <td>{{ certificate.NotAfter }}</td>
+    </tr>
+    <tr>
+      <th>Key Usage:</th>
+      <td>{{ certificate.KeyUsage }}</td>
+    </tr>
+    <tr>
+      <th>Subject Key ID:</th>
+      <td>{{ certificate.SubjectKeyId }}</td>
+    </tr>
+  </tbody>
+</table>
+{% endblock %}

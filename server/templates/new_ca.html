@@ -1,6 +1,8 @@
-{{define "title"}}Create New CA{{end}}
+{% extends "templates/base.html" %}
 
-{{define "content"}}
+{% block title %}Create New CA{% endblock %}
+
+{% block content %}
 <div class="heading">Create New CA</div>
 <form method="post">
   <label>
@@ -19,4 +21,4 @@
     <button type="submit" class="button">Create</button>
   </div>
 </form>
-{{end}}
+{% endblock %}

@@ -1,37 +1,21 @@
 package server
 
 import (
-	"embed"
-	"html/template"
 	"net/http"
 
+	"github.com/flosch/pongo2/v6"
 	"github.com/gin-gonic/gin"
 	"github.com/nathan-osman/certy/storage"
 )
 
-var (
-	//go:embed templates/*
-	tmplFS embed.FS
-)
-
-func render(c *gin.Context, name string, data any) {
-	t, err := template.ParseFS(tmplFS, "templates/base.html", name)
-	if err != nil {
-		panic(err)
-	}
-	if err := t.Execute(c.Writer, data); err != nil {
-		panic(err)
-	}
-}
-
 func (s *Server) index(c *gin.Context) {
-	render(c, "templates/index.html", gin.H{
-		"Certificates": s.storage.ListCAs(),
+	c.HTML(http.StatusOK, "templates/index.html", pongo2.Context{
+		"entries": s.storage.ListCAs(),
 	})
 }
 
 func (s *Server) newCAGET(c *gin.Context) {
-	render(c, "templates/new_ca.html", gin.H{})
+	c.HTML(http.StatusOK, "templates/new_ca.html", pongo2.Context{})
 }
 
 func (s *Server) newCAPOST(c *gin.Context) {
@@ -43,4 +27,16 @@ func (s *Server) newCAPOST(c *gin.Context) {
 		panic(err)
 	}
 	c.Redirect(http.StatusFound, "/")
+}
+
+func (s *Server) viewCAGET(c *gin.Context) {
+	u := c.Param("uuid")
+	v, err := s.storage.LoadCA(u)
+	if err != nil {
+		panic(err)
+	}
+	c.HTML(http.StatusOK, "templates/view_ca.html", pongo2.Context{
+		"name":        u,
+		"certificate": v,
+	})
 }

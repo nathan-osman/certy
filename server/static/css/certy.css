@@ -95,7 +95,7 @@ label {
   color: var(--color1);
 }
 
-.table thead tr th {
+.table th {
   text-align: left;
 }
 

@@ -1,5 +1,9 @@
-{{define "content"}}
-<div class="heading">Root CAs Currently Registered</div>
+{% extends "templates/base.html" %}
+
+{% block title %}Root CAs{% endblock %}
+
+{% block content %}
+<div class="heading">Root CAs</div>
 <table class="table">
   <thead>
     <tr>
@@ -9,18 +13,20 @@
     </tr>
   </thead>
   <tbody>
-    {{range .Certificates}}
+    {% for e in entries %}
       <tr>
         <td>
-          <a href="#">{{.Subject.CommonName}}</a>
+          <a href="/{{ e.Name }}">
+            {{ e.Certificate.Subject.CommonName}}
+          </a>
         </td>
-        <td>{{.NotBefore}}</td>
-        <td>{{.NotAfter}}</td>
+        <td>{{ e.Certificate.NotBefore }}</td>
+        <td>{{ e.Certificate.NotAfter }}</td>
       </tr>
-    {{end}}
+    {% endfor %}
   </tbody>
 </table>
 <div class="buttons">
   <a href="/new" class="button">Create New</a>
 </div>
-{{end}}
+{% endblock %}

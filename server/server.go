@@ -7,11 +7,14 @@ import (
 	"net/http"
 	"path"
 
+	"github.com/flosch/pongo2/v6"
 	"github.com/gin-contrib/static"
 	"github.com/gin-gonic/gin"
 	"github.com/nathan-osman/certy/storage"
+	loader "github.com/nathan-osman/pongo2-embed-loader"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
+	"gitlab.com/go-box/pongo2gin/v6"
 )
 
 // Server provides the web interface for interacting with the CA and
@@ -23,8 +26,11 @@ type Server struct {
 }
 
 var (
-	//go:embed static/*
+	//go:embed static
 	staticFS embed.FS
+
+	//go:embed templates
+	tmplFS embed.FS
 )
 
 type embedFileSystem struct {
@@ -54,10 +60,21 @@ func New(addr string, st *storage.Storage) *Server {
 		}
 	)
 
+	// Load the template set
+	tmplSet := pongo2.NewSet("", &loader.Loader{
+		Content: tmplFS,
+	})
+
+	// Render HTML templates with pongo
+	r.HTMLRender = pongo2gin.New(pongo2gin.RenderOptions{
+		TemplateSet: tmplSet,
+	})
+
 	// Interface pages
 	r.GET("/", s.index)
 	r.GET("/new", s.newCAGET)
 	r.POST("/new", s.newCAPOST)
+	r.GET("/:uuid", s.viewCAGET)
 
 	// Static files
 	r.Use(static.Serve("/", embedFileSystem{http.FS(staticFS)}))

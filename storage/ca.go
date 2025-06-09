@@ -3,6 +3,7 @@ package storage
 import (
 	"crypto/x509"
 	"crypto/x509/pkix"
+	"errors"
 	"math/big"
 	"os"
 	"path/filepath"
@@ -39,14 +40,22 @@ func (s *Storage) loadCAs() (map[string]*x509.Certificate, error) {
 
 // TODO: sort this list deterministically?
 
+type Entry struct {
+	Name        string
+	Certificate *x509.Certificate
+}
+
 // ListCAs returns a list of CAs loaded from disk. This function is
 // thread-safe.
-func (s *Storage) ListCAs() []*x509.Certificate {
+func (s *Storage) ListCAs() []*Entry {
 	s.mutex.RLock()
 	defer s.mutex.RUnlock()
-	cas := []*x509.Certificate{}
-	for _, v := range s.cas {
-		cas = append(cas, v)
+	cas := []*Entry{}
+	for k, v := range s.cas {
+		cas = append(cas, &Entry{
+			Name:        k,
+			Certificate: v,
+		})
 	}
 	return cas
 }
@@ -101,4 +110,15 @@ func (s *Storage) CreateCA(params *CreateCAParams) error {
 	}
 	s.cas[uuid] = c
 	return nil
+}
+
+// LoadCA attempts to load the provided certificate.
+func (s *Storage) LoadCA(name string) (*x509.Certificate, error) {
+	s.mutex.RLock()
+	defer s.mutex.RUnlock()
+	c, ok := s.cas[name]
+	if !ok {
+		return nil, errors.New("no such certificate")
+	}
+	return c, nil
 }

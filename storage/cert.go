@@ -7,6 +7,8 @@ import (
 	"encoding/pem"
 	"errors"
 	"os"
+	"path/filepath"
+	"strconv"
 )
 
 const typeCertificate = "CERTIFICATE"
@@ -54,4 +56,30 @@ func createCertificate(
 		return err
 	}
 	return nil
+}
+
+func (s *Storage) createNextSerial(path string) (int, string, error) {
+	s.mutex.Lock()
+	defer s.mutex.Unlock()
+	entries, err := os.ReadDir(s.dataDir)
+	if err != nil {
+		return 0, "", err
+	}
+	highestSeen := 0
+	for _, e := range entries {
+		if e.IsDir() {
+			v, err := strconv.Atoi(e.Name())
+			if err == nil {
+				highestSeen = max(highestSeen, v)
+			}
+		}
+	}
+	var (
+		serial    = highestSeen + 1
+		serialStr = strconv.Itoa(serial)
+	)
+	if err := os.MkdirAll(filepath.Join(s.dataDir, path, serialStr), 0700); err != nil {
+		return 0, "", err
+	}
+	return serial, serialStr, nil
 }

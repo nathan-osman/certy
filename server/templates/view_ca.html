@@ -38,6 +38,11 @@
     </tr>
   </tbody>
 </table>
+<div class="buttons">
+  <a href="/{{ name }}/export/pem" class="button">Export PEM</a>
+  <a href="/{{ name }}/export/der" class="button">Export DER (.cer)</a>
+</div>
+<br />
 <div class="heading">Certificates</div>
 {% import 'templates/macros/entries.html' entry_table %}
 {{ entry_table("/" + name + "/", entries) }}

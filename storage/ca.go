@@ -149,21 +149,19 @@ type CreateCertParams struct {
 	Validity   string `form:"validity"`
 }
 
-// TODO: serial needs to be incremented!!
-
 // CreateCert creates a new certificate on disk using the provided parent.
 func (s *Storage) CreateCert(parent string, params *CreateCertParams) (string, error) {
+	serial, serialStr, err := s.createNextSerial(parent)
+	if err != nil {
+		return "", nil
+	}
 	var (
 		n         = time.Now()
-		uuid      = uuid.New().String()
 		parentDir = filepath.Join(s.dataDir, parent)
-		dir       = filepath.Join(parentDir, uuid)
+		dir       = filepath.Join(parentDir, serialStr)
 	)
 	v, err := parseValidity(n, params.Validity)
 	if err != nil {
-		return "", err
-	}
-	if err := os.MkdirAll(dir, 0700); err != nil {
 		return "", err
 	}
 	p, err := generatePrivateKey(filepath.Join(dir, "key.pem"))
@@ -171,12 +169,15 @@ func (s *Storage) CreateCert(parent string, params *CreateCertParams) (string, e
 		return "", err
 	}
 	c := &x509.Certificate{
-		SerialNumber: big.NewInt(1),
+		SerialNumber: big.NewInt(int64(serial)),
 		Subject: pkix.Name{
 			CommonName: params.CommonName,
 		},
-		NotBefore: n,
-		NotAfter:  v,
+		NotBefore:             n,
+		NotAfter:              v,
+		KeyUsage:              x509.KeyUsageDigitalSignature,
+		ExtKeyUsage:           []x509.ExtKeyUsage{x509.ExtKeyUsageClientAuth},
+		BasicConstraintsValid: true,
 	}
 	s.mutex.Lock()
 	defer s.mutex.Unlock()
@@ -198,5 +199,5 @@ func (s *Storage) CreateCert(parent string, params *CreateCertParams) (string, e
 		return "", err
 	}
 
-	return uuid, nil
+	return serialStr, nil
 }

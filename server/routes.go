@@ -32,13 +32,19 @@ func (s *Server) newCAPOST(c *gin.Context) {
 }
 
 func (s *Server) viewCAGET(c *gin.Context) {
-	u := c.Param("uuid")
-	v, err := s.storage.LoadCA(u)
-	if err != nil {
-		panic(err)
-	}
 	c.HTML(http.StatusOK, "templates/view_ca.html", pongo2.Context{
-		"name":        u,
-		"certificate": v,
+		"name":        c.GetString(contextCAName),
+		"certificate": certFromContext(c, contextCACert),
 	})
+}
+
+func (s *Server) caNewGET(c *gin.Context) {
+	c.HTML(http.StatusOK, "templates/new_cert.html", pongo2.Context{
+		"name":        c.GetString(contextCAName),
+		"certificate": certFromContext(c, contextCACert),
+	})
+}
+
+func (s *Server) caNewPOST(c *gin.Context) {
+	//...
 }

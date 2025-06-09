@@ -57,6 +57,8 @@ label {
 }
 
 .buttons {
+  display: flex;
+  column-gap: 4px;
   margin: 16px 0;
 }
 

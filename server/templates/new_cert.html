@@ -1,0 +1,7 @@
+{% extends "templates/base.html" %}
+
+{% block title %}New Certificate for {{ certificate.Subject.CommonName }}{% endblock %}
+
+{% block content %}
+<div class="heading">New Certificate for {{ certificate.Subject.CommonName }}</div>
+{% endblock %}

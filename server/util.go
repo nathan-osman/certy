@@ -1,12 +1,14 @@
 package server
 
 import (
+	"crypto/x509"
 	"errors"
 	"fmt"
 	"strings"
 	"time"
 
 	"github.com/flosch/pongo2/v6"
+	"github.com/gin-gonic/gin"
 )
 
 func formatDate(in *pongo2.Value, param *pongo2.Value) (*pongo2.Value, *pongo2.Error) {
@@ -37,4 +39,9 @@ func formatBytes(in *pongo2.Value, param *pongo2.Value) (*pongo2.Value, *pongo2.
 	return pongo2.AsValue(
 		strings.Join(values, ":"),
 	), nil
+}
+
+func certFromContext(c *gin.Context, name string) *x509.Certificate {
+	v, _ := c.Get(name)
+	return v.(*x509.Certificate)
 }

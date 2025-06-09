@@ -16,6 +16,11 @@ import (
 	"gitlab.com/go-box/pongo2gin/v6"
 )
 
+const (
+	contextCAName = "ca_name"
+	contextCACert = "ca_cert"
+)
+
 var (
 	//go:embed static
 	staticFS embed.FS
@@ -62,10 +67,27 @@ func New(addr string, st *storage.Storage) (*Server, error) {
 	})
 
 	// Interface pages
+
 	r.GET("/", s.index)
 	r.GET("/new", s.newCAGET)
 	r.POST("/new", s.newCAPOST)
-	r.GET("/:uuid", s.viewCAGET)
+
+	groupCA := r.Group("/:uuid")
+	{
+		groupCA.Use(func(c *gin.Context) {
+			u := c.Param("uuid")
+			v, err := s.storage.LoadCA(u)
+			if err != nil {
+				panic(err)
+			}
+			c.Set(contextCAName, u)
+			c.Set(contextCACert, v)
+			c.Next()
+		})
+		groupCA.GET("", s.viewCAGET)
+		groupCA.GET("/new", s.caNewGET)
+		groupCA.POST("/new", s.caNewPOST)
+	}
 
 	// Static files
 	f, err := static.EmbedFolder(staticFS, "static")

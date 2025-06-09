@@ -31,13 +31,17 @@ func main() {
 		Action: func(c *cli.Context) error {
 
 			// Create the storage instance
-			s, err := storage.New(c.String("data-dir"))
+			m, err := storage.New(c.String("data-dir"))
 			if err != nil {
 				return err
 			}
 
 			// Start the server
-			defer server.New(c.String("server-addr"), s).Close()
+			s, err := server.New(c.String("server-addr"), m)
+			if err != nil {
+				return err
+			}
+			defer s.Close()
 
 			// Wait for SIGINT or SIGTERM
 			sigChan := make(chan os.Signal, 1)

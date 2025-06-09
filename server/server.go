@@ -5,7 +5,6 @@ import (
 	"embed"
 	"errors"
 	"net/http"
-	"path"
 
 	"github.com/flosch/pongo2/v6"
 	"github.com/gin-contrib/static"
@@ -17,14 +16,6 @@ import (
 	"gitlab.com/go-box/pongo2gin/v6"
 )
 
-// Server provides the web interface for interacting with the CA and
-// certificate functions in the storage package.
-type Server struct {
-	server  http.Server
-	logger  zerolog.Logger
-	storage *storage.Storage
-}
-
 var (
 	//go:embed static
 	staticFS embed.FS
@@ -33,21 +24,20 @@ var (
 	tmplFS embed.FS
 )
 
-type embedFileSystem struct {
-	http.FileSystem
+func init() {
+	pongo2.RegisterFilter("formatDate", formatDate)
 }
 
-func (e embedFileSystem) Exists(prefix, filepath string) bool {
-	f, err := e.Open(path.Join(prefix, filepath))
-	if err != nil {
-		return false
-	}
-	f.Close()
-	return true
+// Server provides the web interface for interacting with the CA and
+// certificate functions in the storage package.
+type Server struct {
+	server  http.Server
+	logger  zerolog.Logger
+	storage *storage.Storage
 }
 
 // New create a new Server instance.
-func New(addr string, st *storage.Storage) *Server {
+func New(addr string, st *storage.Storage) (*Server, error) {
 	var (
 		r = gin.New()
 		s = &Server{
@@ -77,7 +67,11 @@ func New(addr string, st *storage.Storage) *Server {
 	r.GET("/:uuid", s.viewCAGET)
 
 	// Static files
-	r.Use(static.Serve("/", embedFileSystem{http.FS(staticFS)}))
+	f, err := static.EmbedFolder(staticFS, "static")
+	if err != nil {
+		return nil, err
+	}
+	r.Use(static.Serve("/static", f))
 
 	// Listen for connections in a separate goroutine
 	go func() {
@@ -88,7 +82,7 @@ func New(addr string, st *storage.Storage) *Server {
 		}
 	}()
 
-	return s
+	return s, nil
 }
 
 // Close shuts down the server.

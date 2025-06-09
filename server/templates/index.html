@@ -20,8 +20,8 @@
             {{ e.Certificate.Subject.CommonName}}
           </a>
         </td>
-        <td>{{ e.Certificate.NotBefore }}</td>
-        <td>{{ e.Certificate.NotAfter }}</td>
+        <td>{{ e.Certificate.NotBefore | formatDate }}</td>
+        <td>{{ e.Certificate.NotAfter | formatDate }}</td>
       </tr>
     {% endfor %}
   </tbody>

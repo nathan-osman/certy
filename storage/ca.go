@@ -7,9 +7,15 @@ import (
 	"math/big"
 	"os"
 	"path/filepath"
+	"regexp"
+	"strconv"
 	"time"
 
 	"github.com/google/uuid"
+)
+
+var (
+	validityRegExp = regexp.MustCompile(`(\d+)(\w+)`)
 )
 
 func (s *Storage) loadCA(dir string) (*x509.Certificate, error) {
@@ -62,11 +68,39 @@ func (s *Storage) ListCAs() []*Entry {
 
 // CreateCAParams provides CreateCA with parameters for the new CA.
 type CreateCAParams struct {
-	CommonName    string        `form:"common_name"`
-	Organization  string        `form:"organization"`
-	Country       string        `form:"country"`
-	Validity      time.Duration `form:"validity"`
-	UsageCertSign bool          `form:"usage_cert_sign"`
+	CommonName    string `form:"common_name"`
+	Organization  string `form:"organization"`
+	Country       string `form:"country"`
+	Validity      string `form:"validity"`
+	UsageCertSign bool   `form:"usage_cert_sign"`
+}
+
+func parseValidity(n time.Time, validity string) (time.Time, error) {
+	m := validityRegExp.FindStringSubmatch(validity)
+	if len(m) != 3 {
+		return time.Time{}, errors.New("invalid validity specified")
+	}
+	v, err := strconv.Atoi(m[1])
+	if err != nil {
+		return time.Time{}, err
+	}
+	switch m[2] {
+	case "d":
+		return n.Add(time.Duration(v) * 24 * time.Hour), nil
+	case "y":
+		return time.Date(
+			n.Year()+v,
+			n.Month(),
+			n.Day(),
+			n.Hour(),
+			n.Minute(),
+			n.Second(),
+			n.Nanosecond(),
+			n.Location(),
+		), nil
+	default:
+		return time.Time{}, errors.New("invalid time unit specified")
+	}
 }
 
 // TODO: delete the intermediate files if something fails in this method
@@ -75,9 +109,14 @@ type CreateCAParams struct {
 // CreateCA creates a new CA on disk using the provided data.
 func (s *Storage) CreateCA(params *CreateCAParams) error {
 	var (
+		n    = time.Now()
 		uuid = uuid.New().String()
 		dir  = filepath.Join(s.dataDir, uuid)
 	)
+	v, err := parseValidity(n, params.Validity)
+	if err != nil {
+		return err
+	}
 	if err := os.MkdirAll(dir, 0700); err != nil {
 		return err
 	}
@@ -86,7 +125,6 @@ func (s *Storage) CreateCA(params *CreateCAParams) error {
 		return err
 	}
 	var (
-		n = time.Now()
 		c = &x509.Certificate{
 			SerialNumber: big.NewInt(1),
 			Subject: pkix.Name{
@@ -95,7 +133,7 @@ func (s *Storage) CreateCA(params *CreateCAParams) error {
 				Country:      []string{params.Country},
 			},
 			NotBefore:             n,
-			NotAfter:              n.Add(params.Validity),
+			NotAfter:              v,
 			BasicConstraintsValid: true,
 			IsCA:                  true,
 		}

@@ -23,12 +23,13 @@ a:hover {
   color: var(--color2);
 }
 
-input {
+input, select {
   border: 2px solid var(--color3);
+  display: block;
   padding: 8px;
 }
 
-input, .button {
+input, select, .button {
   font-size: 12pt;
 }
 

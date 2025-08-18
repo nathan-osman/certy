@@ -9,9 +9,16 @@ import (
 	"os"
 )
 
-const typePrivateKey = "RSA PRIVATE KEY"
+const (
+	typePrivateKey = "RSA PRIVATE KEY"
+	typePublicKey  = "PUBLIC KEY"
 
-var errNotAPrivateKey = errors.New("file is not a PEM-encoded private key")
+	filenamePrivateKey = "key.pem"
+)
+
+var (
+	errNotAPrivateKey = errors.New("file is not a PEM-encoded private key")
+)
 
 func generatePrivateKey(filename string) (*rsa.PrivateKey, error) {
 	p, err := rsa.GenerateKey(rand.Reader, 2048)

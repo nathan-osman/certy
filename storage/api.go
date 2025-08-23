@@ -199,7 +199,7 @@ func (s *Storage) CreateCertificate(
 	// Begin by loading the parent certificate (if supplied)
 	var (
 		p         *storageCert
-		parentDir string
+		parentDir = s.certDir
 	)
 	if certPath != "" {
 		v, vDir, err := s.getCert(certPath)

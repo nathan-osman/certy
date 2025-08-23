@@ -9,7 +9,7 @@ import (
 	"encoding/pem"
 	"errors"
 	"os"
-	"path"
+	"path/filepath"
 	"strings"
 )
 
@@ -47,7 +47,7 @@ func (s *Storage) loadCerts(
 	for _, e := range entries {
 		if e.IsDir() {
 			c, err := s.loadCert(
-				path.Join(dir, e.Name()),
+				filepath.Join(dir, e.Name()),
 				parent,
 			)
 			if err != nil {
@@ -64,7 +64,7 @@ func (s *Storage) loadCert(
 	dir string,
 	parent *storageCert,
 ) (*storageCert, error) {
-	b, err := os.ReadFile(path.Join(dir, filenameCert))
+	b, err := os.ReadFile(filepath.Join(dir, filenameCert))
 	if err != nil {
 		return nil, err
 	}
@@ -107,7 +107,7 @@ func (s *Storage) getCert(certPath string) (*storageCert, string, error) {
 		}
 		c = v
 		m = v.children
-		d = path.Join(d, v.id)
+		d = filepath.Join(d, v.id)
 	}
 	return c, d, nil
 }
@@ -133,7 +133,7 @@ func (s *Storage) createCertificate(
 		Bytes: c,
 	})
 	f, err := os.OpenFile(
-		path.Join(dir, filenameCert),
+		filepath.Join(dir, filenameCert),
 		os.O_WRONLY|os.O_CREATE|os.O_TRUNC,
 		0600,
 	)

@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"math/big"
 	"os"
-	"path"
+	"path/filepath"
 	"time"
 
 	"software.sslmate.com/src/go-pkcs12"
@@ -127,7 +127,7 @@ func (s *Storage) ExportCertificatePKCS12(
 	if err != nil {
 		return nil, err
 	}
-	k, err := loadPrivateKey(path.Join(d, "key.pem"))
+	k, err := loadPrivateKey(filepath.Join(d, filenamePrivateKey))
 	if err != nil {
 		return nil, err
 	}
@@ -151,7 +151,7 @@ func (s *Storage) ExportPublicKeyPEM(certPath string) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	k, err := loadPrivateKey(path.Join(d, "key.pem"))
+	k, err := loadPrivateKey(filepath.Join(d, filenamePrivateKey))
 	if err != nil {
 		return nil, err
 	}
@@ -170,7 +170,7 @@ func (s *Storage) ExportPrivateKeyPEM(certPath string) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	b, err := os.ReadFile(path.Join(d, "key.pem"))
+	b, err := os.ReadFile(filepath.Join(d, filenamePrivateKey))
 	if err != nil {
 		return nil, err
 	}
@@ -228,7 +228,7 @@ func (s *Storage) CreateCertificate(
 	}
 
 	// Generate a new private key
-	k, err := generatePrivateKey(path.Join(d, filenamePrivateKey))
+	k, err := generatePrivateKey(filepath.Join(d, filenamePrivateKey))
 	if err != nil {
 		return "", err
 	}
@@ -236,7 +236,7 @@ func (s *Storage) CreateCertificate(
 	// Use the new key if this is a root CA; otherwise, load the parent's
 	certPrivateKey := k
 	if p != nil {
-		k, err := loadPrivateKey(path.Join(parentDir, filenamePrivateKey))
+		k, err := loadPrivateKey(filepath.Join(parentDir, filenamePrivateKey))
 		if err != nil {
 			return "", err
 		}
@@ -302,7 +302,7 @@ func (s *Storage) CreateCertificate(
 	// be done when the layout on disk is complete
 
 	// Rename the directory to the certificate's ID
-	if err := os.Rename(d, path.Join(parentDir, c.id)); err != nil {
+	if err := os.Rename(d, filepath.Join(parentDir, c.id)); err != nil {
 		return "", err
 	}
 

@@ -2,7 +2,7 @@ package storage
 
 import (
 	"os"
-	"path"
+	"path/filepath"
 	"strconv"
 )
 
@@ -12,7 +12,7 @@ const (
 
 func (s *Storage) allocNextSerial(dir string) (int64, error) {
 	var (
-		filename       = path.Join(dir, filenameSerial)
+		filename       = filepath.Join(dir, filenameSerial)
 		serial   int64 = 1
 	)
 	b, err := os.ReadFile(filename)

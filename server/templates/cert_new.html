@@ -1,0 +1,26 @@
+{% extends "templates/form.html" %}
+
+{% block title %}New Certificate{% endblock %}
+
+{% block header %}
+<div class="title">New Certificate</div>
+<div class="desc">
+  Create a new
+  {% if cert %}
+    certificate signed by {{ cert.X509.Subject.CommonName }}
+  {% else %}
+    root certificate
+  {% endif %}
+</div>
+{% endblock %}
+
+{% block fields %}
+{% import 'templates/macros/form.html' form_duration, form_input %}
+{% if cert %}
+  {% set placeholder = "e.g. Intermediate CA" %}
+{% else %}
+  {% set placeholder = "e.g. John Smith's Root CA" %}
+{% endif %}
+{{ form_input(form, "CommonName", "Common name", placeholder, true) }}
+{{ form_duration(form, "Validity", "Validity") }}
+{% endblock %}

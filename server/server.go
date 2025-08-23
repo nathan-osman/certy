@@ -4,6 +4,7 @@ import (
 	"context"
 	"embed"
 	"errors"
+	"log/slog"
 	"net/http"
 
 	"github.com/flosch/pongo2/v6"
@@ -11,14 +12,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/nathan-osman/certy/storage"
 	loader "github.com/nathan-osman/pongo2-embed-loader"
-	"github.com/rs/zerolog"
-	"github.com/rs/zerolog/log"
 	"gitlab.com/go-box/pongo2gin/v6"
-)
-
-const (
-	contextCAName = "ca_name"
-	contextCACert = "ca_cert"
 )
 
 var (
@@ -27,6 +21,11 @@ var (
 
 	//go:embed templates
 	tmplFS embed.FS
+
+	formMethods = []string{
+		http.MethodGet,
+		http.MethodPost,
+	}
 )
 
 func init() {
@@ -38,23 +37,29 @@ func init() {
 // certificate functions in the storage package.
 type Server struct {
 	server  http.Server
-	logger  zerolog.Logger
+	logger  *slog.Logger
 	storage *storage.Storage
 }
 
 // New create a new Server instance.
-func New(addr string, st *storage.Storage) (*Server, error) {
+func New(cfg *Config) (*Server, error) {
 	var (
 		r = gin.New()
 		s = &Server{
 			server: http.Server{
-				Addr:    addr,
+				Addr:    cfg.Addr,
 				Handler: r,
 			},
-			logger:  log.With().Str("package", "server").Logger(),
-			storage: st,
+			logger:  cfg.Logger,
+			storage: cfg.Storage,
 		}
 	)
+
+	// Configure the logger
+	if s.logger == nil {
+		s.logger = slog.Default()
+	}
+	s.logger = s.logger.With("package", "server")
 
 	// Load the template set
 	tmplSet := pongo2.NewSet("", &loader.Loader{
@@ -69,28 +74,10 @@ func New(addr string, st *storage.Storage) (*Server, error) {
 	// Handle errors gracefully
 	r.Use(gin.CustomRecovery(s.errorHandler))
 
-	// Interface pages
-
+	// TODO: not do this
 	r.GET("/", s.index)
-	r.GET("/new", s.newCAGET)
-	r.POST("/new", s.newCAPOST)
-
-	groupCA := r.Group("/:uuid")
-	{
-		groupCA.Use(func(c *gin.Context) {
-			u := c.Param("uuid")
-			v, err := s.storage.LoadCA(u)
-			if err != nil {
-				panic(err)
-			}
-			c.Set(contextCAName, u)
-			c.Set(contextCACert, v)
-			c.Next()
-		})
-		groupCA.GET("", s.viewCAGET)
-		groupCA.GET("/new", s.caNewCertGET)
-		groupCA.POST("/new", s.caNewCertPOST)
-	}
+	r.GET("/view", s.certView)
+	r.Match(formMethods, "/new", s.certNew)
 
 	// Static files
 	f, err := static.EmbedFolder(staticFS, "static")
@@ -101,10 +88,10 @@ func New(addr string, st *storage.Storage) (*Server, error) {
 
 	// Listen for connections in a separate goroutine
 	go func() {
-		defer s.logger.Info().Msg("server stopped")
-		s.logger.Info().Msg("server started")
+		defer s.logger.Info("server stopped")
+		s.logger.Info("server started")
 		if err := s.server.ListenAndServe(); !errors.Is(err, http.ErrServerClosed) {
-			s.logger.Error().Msg(err.Error())
+			s.logger.Error(err.Error())
 		}
 	}()
 

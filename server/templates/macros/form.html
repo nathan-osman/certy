@@ -1,0 +1,23 @@
+{# Display a text input #}
+{% macro form_input(form, name, label, placeholder="", autofocus=false) export %}
+  {% if autofocus %}
+    {% set autofocus = "autofocus" %}
+  {% else %}
+    {% set autofocus = "" %}
+  {% endif %}
+  <label>
+    {{ label }}:
+    <input
+      type="text"
+      name="{{ name }}"
+      placeholder="{{ placeholder }}"
+      value="{{ form[name] }}"
+      class="input"
+      {{ autofocus }}
+      />
+  </label>
+{% endmacro %}
+
+{% macro form_duration(form, name, label) export %}
+  {{ form_input(form, name, label, "e.g. 3y, 4w, 90d, etc.") }}
+{% endmacro %}

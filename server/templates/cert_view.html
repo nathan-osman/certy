@@ -1,0 +1,17 @@
+{% extends "templates/base.html" %}
+
+{% block title %}{{ cert.X509.Subject.CommonName }}{% endblock %}
+
+{% block header %}
+<div class="title">{{ cert.X509.Subject.CommonName }}</div>
+<div class="desc">
+  View and manage this certificate and its children
+</div>
+{% endblock %}
+
+{% block content %}
+{% if cert.Children %}
+  {% import 'templates/macros/table.html' ref_table %}
+  {{ ref_table(path, cert.Children) }}
+{% endif %}
+{% endblock %}

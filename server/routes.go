@@ -23,55 +23,51 @@ func (s *Server) errorHandler(c *gin.Context, err any) {
 
 func (s *Server) index(c *gin.Context) {
 	c.HTML(http.StatusOK, "templates/index.html", pongo2.Context{
-		"entries": s.storage.ListCAs(),
+		"refs": s.storage.GetRootCertificates(),
 	})
 }
 
-func (s *Server) newCAGET(c *gin.Context) {
-	c.HTML(http.StatusOK, "templates/new_ca.html", pongo2.Context{})
-}
-
-func (s *Server) newCAPOST(c *gin.Context) {
-	params := &storage.CreateCAParams{}
-	if err := c.ShouldBind(params); err != nil {
-		panic(err)
-	}
-	u, err := s.storage.CreateCA(params)
+func (s *Server) certView(c *gin.Context) {
+	p := c.Query("cert")
+	v, err := s.storage.GetCertificate(p)
 	if err != nil {
 		panic(err)
 	}
-	c.Redirect(http.StatusFound, fmt.Sprintf("/%s", u))
-}
-
-func (s *Server) viewCAGET(c *gin.Context) {
-	c.HTML(http.StatusOK, "templates/view_ca.html", pongo2.Context{
-		"name":        c.GetString(contextCAName),
-		"certificate": certFromContext(c, contextCACert),
+	c.HTML(http.StatusOK, "templates/cert_view.html", pongo2.Context{
+		"path": p,
+		"cert": v,
 	})
 }
 
-func (s *Server) caNewCertGET(c *gin.Context) {
-	c.HTML(http.StatusOK, "templates/new_cert.html", pongo2.Context{
-		"name":        c.GetString(contextCAName),
-		"certificate": certFromContext(c, contextCACert),
-	})
-}
-
-func (s *Server) caNewCertPOST(c *gin.Context) {
+func (s *Server) certNew(c *gin.Context) {
 	var (
-		parentName = c.GetString(contextCAName)
-		params     = &storage.CreateCertParams{}
+		p    = c.Query("cert")
+		cert *storage.Certificate
+		form = &storage.CreateCertificateParams{}
 	)
-	if err := c.ShouldBind(params); err != nil {
-		panic(err)
+	if p != "" {
+		v, err := s.storage.GetCertificate(p)
+		if err != nil {
+			panic(err)
+		}
+		cert = v
 	}
-	u, err := s.storage.CreateCert(parentName, params)
-	if err != nil {
-		panic(err)
+	if c.Request.Method == http.MethodPost {
+		if err := c.ShouldBind(form); err != nil {
+			panic(err)
+		}
+		v, err := s.storage.CreateCertificate(p, form)
+		if err != nil {
+			panic(err)
+		}
+		c.Redirect(
+			http.StatusSeeOther,
+			fmt.Sprintf("/view?cert=%s", v),
+		)
+		return
 	}
-	c.Redirect(http.StatusFound, fmt.Sprintf(
-		"/%s/%s",
-		parentName,
-		u,
-	))
+	c.HTML(http.StatusOK, "templates/cert_new.html", pongo2.Context{
+		"cert": cert,
+		"form": form,
+	})
 }

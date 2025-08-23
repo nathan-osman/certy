@@ -1,12 +1,15 @@
 {% extends "templates/base.html" %}
 
-{% block title %}Root CAs{% endblock %}
+{% block title %}Root Certificates{% endblock %}
+
+{% block header %}
+<div class="title">Root Certificates</div>
+<div class="desc">
+  View root certificates currently managed by Certy
+</div>
+{% endblock %}
 
 {% block content %}
-<div class="heading">Root CAs</div>
-{% import 'templates/macros/entries.html' entry_table %}
-{{ entry_table("/", entries) }}
-<div class="buttons">
-  <a href="/new" class="button">Create New</a>
-</div>
+{% import 'templates/macros/table.html' ref_table %}
+{{ ref_table("", refs) }}
 {% endblock %}

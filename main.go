@@ -31,13 +31,18 @@ func main() {
 		Action: func(c *cli.Context) error {
 
 			// Create the storage instance
-			m, err := storage.New(c.String("data-dir"))
+			st, err := storage.New(&storage.Config{
+				DataDir: c.String("data-dir"),
+			})
 			if err != nil {
 				return err
 			}
 
 			// Start the server
-			s, err := server.New(c.String("server-addr"), m)
+			s, err := server.New(&server.Config{
+				Addr:    c.String("server-addr"),
+				Storage: st,
+			})
 			if err != nil {
 				return err
 			}

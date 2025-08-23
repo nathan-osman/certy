@@ -112,7 +112,7 @@ func (s *Storage) ExportCertificateChainPEM(certPath string) ([]byte, error) {
 // ExportCertificatePKCS12Params provides ExportCertificatePKCS12 with
 // parameters for exporting a certificate and its private key.
 type ExportCertificatePKCS12Params struct {
-	Password string `form:"password"`
+	Password string
 }
 
 // ExportCertificatePKCS12 exports the specified certificate and its private
@@ -183,8 +183,8 @@ func (s *Storage) ExportPrivateKeyPEM(certPath string) ([]byte, error) {
 // CreateCertificateParams provides CreateCertificate with parameters for
 // creating a new X.509 certificate and private key.
 type CreateCertificateParams struct {
-	CommonName string `form:"common_name"`
-	Validity   string `form:"validity"`
+	CommonName string
+	Validity   string
 }
 
 // CreateCertificate creates a new certificate & private key. The certificate
@@ -196,10 +196,18 @@ func (s *Storage) CreateCertificate(
 	s.mutex.Lock()
 	defer s.mutex.Unlock()
 
-	// Begin by loading the parent certificate
-	p, parentDir, err := s.getCert(certPath)
-	if err != nil {
-		return "", err
+	// Begin by loading the parent certificate (if supplied)
+	var (
+		p         *storageCert
+		parentDir string
+	)
+	if certPath != "" {
+		v, vDir, err := s.getCert(certPath)
+		if err != nil {
+			return "", err
+		}
+		p = v
+		parentDir = vDir
 	}
 
 	// The directory for the certificate and private key needs to be created

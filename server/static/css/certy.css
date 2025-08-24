@@ -45,6 +45,7 @@ a:hover {
 
 .header {
   background-color: var(--color-primary);
+  border-bottom: 16px solid var(--color-primary-light);
   color: var(--color-panel);
   margin-bottom: var(--spacing-elements-lg);
   padding: var(--padding-panel-lg);

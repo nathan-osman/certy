@@ -56,6 +56,8 @@ github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd h1:TRLaZ9cD/w
 github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd/go.mod h1:6dJC0mAP4ikYIbvyc7fijjWJddQyLn8Ig3JB5CqoB9Q=
 github.com/modern-go/reflect2 v1.0.2 h1:xBagoLtFs94CBntxluKeaWgTMpvLxC4ur3nMaC9Gz0M=
 github.com/modern-go/reflect2 v1.0.2/go.mod h1:yWuevngMOJpCy52FWWMvUC8ws7m/LJsjYzDa0/r8luk=
+github.com/nathan-osman/gosvc v0.1.1 h1:ncsStXiXQBHHhAnP1C9Nlgpg80Bg8neCyKWLKyqHXAo=
+github.com/nathan-osman/gosvc v0.1.1/go.mod h1:zkcMS71OYNA+WIts/2ePuamUY9TY0HH5CjJT1V1zqt8=
 github.com/nathan-osman/pongo2-embed-loader v1.0.1 h1:0T+8cmJlbMSq3a1wJVo4SQH8xLV7gQfQhvekvdSZv4c=
 github.com/nathan-osman/pongo2-embed-loader v1.0.1/go.mod h1:EDvaGcXnbYSD0sk8ZEa/fza3gu9I4TPZd4V4RdS42Jw=
 github.com/niemeyer/pretty v0.0.0-20200227124842-a10e7caefd8e/go.mod h1:zD1mROLANZcx1PVRCS0qkT7pwLkGfwJo4zjcN/Tysno=

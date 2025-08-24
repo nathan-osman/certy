@@ -8,7 +8,15 @@ import (
 
 	"github.com/nathan-osman/certy/server"
 	"github.com/nathan-osman/certy/storage"
+	"github.com/nathan-osman/gosvc"
 	"github.com/urfave/cli/v2"
+)
+
+var (
+	a = &gosvc.Application{
+		Name:        "certy",
+		Description: "Manage X.509 certs. & keys",
+	}
 )
 
 func main() {
@@ -28,6 +36,7 @@ func main() {
 				Usage:   "HTTP address to listen on",
 			},
 		},
+		Commands: gosvc.Commands(a.Platform()),
 		Action: func(c *cli.Context) error {
 
 			// Create the storage instance

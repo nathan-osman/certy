@@ -27,17 +27,17 @@
   <table class="table">
     <tbody>
       <tr>
-        <th>SHA-256 Fingerprint:</th>
+        <th>SHA-256 fingerprint:</th>
         <td title="{{ cert.Fingerprint }}">
           {{ cert.Fingerprint|truncatechars:20 }}&mldr;
         </td>
       </tr>
       <tr>
-        <th>Common Name:</th>
+        <th>Common name:</th>
         <td>{{ certname(cert.X509.Subject) }}</td>
       </tr>
       <tr>
-        <th>Issued By:</th>
+        <th>Issued by:</th>
         <td>{{ certname(cert.X509.Issuer) }}</td>
       </tr>
       <tr>
@@ -54,9 +54,17 @@
         </td>
       </tr>
       <tr>
-        <th>Can sign certificates:</th>
+        <th>Certificate authority:</th>
         <td>
-          {% if cert.CanSign() %}yes{% else %}no{% endif %}
+          {% if cert.X509.IsCA %}yes{% else %}no{% endif %}
+        </td>
+      </tr>
+      <tr>
+        <th>Key usage:</th>
+        <td>
+          {% for u in cert.KeyUsage() %}
+            <div>{{ u }}</div>
+          {% endfor %}
         </td>
       </tr>
       {% if cert.X509.DNSNames %}

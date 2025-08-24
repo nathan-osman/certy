@@ -35,11 +35,33 @@ func (c *Certificate) CanSign() bool {
 	return c.X509.IsCA && c.X509.KeyUsage&x509.KeyUsageCertSign != 0
 }
 
+func (c *Certificate) KeyUsage() []string {
+	usages := []string{}
+	if c.X509.KeyUsage&x509.KeyUsageCertSign != 0 {
+		usages = append(usages, "certificate signing")
+	}
+	if c.X509.KeyUsage&x509.KeyUsageDigitalSignature != 0 {
+		usages = append(usages, "digital signature")
+	}
+	if c.X509.KeyUsage&x509.KeyUsageKeyEncipherment != 0 {
+		usages = append(usages, "key encipherment")
+	}
+	for _, u := range c.X509.ExtKeyUsage {
+		switch u {
+		case x509.ExtKeyUsageClientAuth:
+			usages = append(usages, "client auth")
+		case x509.ExtKeyUsageServerAuth:
+			usages = append(usages, "server auth")
+		}
+	}
+	return usages
+}
+
 func parentList(p *storageCert) []*Ref {
 	parents := []*Ref{}
 	for p != nil {
 		parents = append([]*Ref{
-			&Ref{
+			{
 				ID:   p.id,
 				X509: p.cert,
 			},
@@ -284,7 +306,6 @@ func (s *Storage) CreateCertificate(
 			},
 			NotBefore:             n,
 			NotAfter:              n.Add(v),
-			ExtKeyUsage:           []x509.ExtKeyUsage{x509.ExtKeyUsageClientAuth},
 			BasicConstraintsValid: true,
 			IsCA:                  params.CanSign,
 		}

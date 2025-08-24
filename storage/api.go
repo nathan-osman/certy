@@ -214,10 +214,7 @@ func (s *Storage) ExportPrivateKeyPEM(certPath string) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	return pem.EncodeToMemory(&pem.Block{
-		Type:  typePrivateKey,
-		Bytes: b,
-	}), nil
+	return b, nil
 }
 
 // CreateCertificateParams provides CreateCertificate with parameters for

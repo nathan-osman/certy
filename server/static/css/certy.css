@@ -75,6 +75,12 @@ a:hover {
   display: flex;
 }
 
+.breadcrumbs > a {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .content .title {
   color: var(--color-fg);
   font-size: 18pt;

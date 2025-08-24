@@ -109,14 +109,16 @@ func (s *Server) certAction(c *gin.Context) {
 		b         []byte
 		err       error
 		suffix    string
-		extension = "pem"
+		extension string
 	)
 	switch c.Query("action") {
 	case "export_cert_pem":
 		b, err = s.storage.ExportCertificatePEM(p)
+		extension = "crt"
 	case "export_chain_pem":
 		b, err = s.storage.ExportCertificateChainPEM(p)
 		suffix = "-chain"
+		extension = "pem"
 	case "export_pub_key":
 		b, err = s.storage.ExportPublicKeyPEM(p)
 		extension = "pub"

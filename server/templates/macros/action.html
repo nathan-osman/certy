@@ -1,7 +1,7 @@
 {# Render an action (form) button #}
 {% macro action(cert, name, label) export %}
   <form method="post" action="/action?cert={{ cert }}&action={{ name }}">
-    <button type="submit" class="button primary">
+    <button type="submit" class="button primary full">
       {{ label }}
     </button>
   </form>

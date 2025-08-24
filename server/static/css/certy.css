@@ -105,6 +105,7 @@ a:hover {
   cursor: pointer;
   font-size: inherit;
   padding: var(--padding-control);
+  text-align: center;
 }
 
 .button.primary {
@@ -116,9 +117,15 @@ a:hover {
   background-color: var(--color-primary-light);
 }
 
+.button.full {
+  width: 100%;
+}
+
 .buttons {
-  column-gap: var(--spacing-elements);
+  align-items: stretch;
   display: flex;
+  flex-direction: column;
+  gap: var(--spacing-elements);
 }
 
 .checkbox {
@@ -238,6 +245,10 @@ a:hover {
 }
 
 @media (min-width: 800px) {
+  .buttons {
+    flex-direction: row;
+  }
+
   .container {
     margin: auto;
     width: 720px;

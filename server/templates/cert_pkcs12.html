@@ -9,6 +9,13 @@
 </div>
 {% endblock %}
 
+{% block content %}
+<div class="muted">
+  PKCS#12 files include both the certificate and its private key. To enhance security, the file is encrypted with a passphrase that will be required on import.
+</div>
+{{ block.Super }}
+{% endblock %}
+
 {% block fields %}
 {% import 'templates/macros/form.html' input %}
 {{ input(form, "Password", "Password", "e.g. SuperSecret123!", true) }}

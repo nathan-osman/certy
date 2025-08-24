@@ -56,7 +56,9 @@
     <a href="/pkcs12?cert={{ path }}" class="button primary">
       PKCS#12
     </a>
-    {{ action(path, "export_chain_pem", "Chain") }}
+    {% if cert.Parents %}
+      {{ action(path, "export_chain_pem", "Chain") }}
+    {% endif %}
     {{ action(path, "export_pub_key", "Pubkey") }}
     {{ action(path, "export_priv_key", "Priv. Key") }}
   </div>

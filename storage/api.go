@@ -30,7 +30,12 @@ type Certificate struct {
 func parentList(p *storageCert) []*Ref {
 	parents := []*Ref{}
 	for p != nil {
-		parents = append([]*Ref{}, parents...)
+		parents = append([]*Ref{
+			&Ref{
+				ID:   p.id,
+				X509: p.cert,
+			},
+		}, parents...)
 		p = p.parent
 	}
 	return parents
@@ -49,7 +54,7 @@ func childList(m map[string]*storageCert) []*Ref {
 
 func convertCert(cert *storageCert) *Certificate {
 	return &Certificate{
-		Parents:  parentList(cert),
+		Parents:  parentList(cert.parent),
 		X509:     cert.cert,
 		Children: childList(cert.children),
 	}

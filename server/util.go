@@ -1,6 +1,7 @@
 package server
 
 import (
+	"crypto/x509/pkix"
 	"errors"
 	"fmt"
 	"net/http"
@@ -71,7 +72,30 @@ func formatDuration(in *pongo2.Value, param *pongo2.Value) (*pongo2.Value, *pong
 	), nil
 }
 
-func (s *Server) downloadCert(
+func ifPresent(v []string) string {
+	if len(v) > 0 {
+		return v[0]
+	}
+	return ""
+}
+
+func combineAddress(n pkix.Name) string {
+	parts := []string{}
+	for _, v := range [][]string{
+		n.StreetAddress,
+		n.Locality,
+		n.Province,
+		n.Country,
+		n.PostalCode,
+	} {
+		if len(v) > 0 {
+			parts = append(parts, v[0])
+		}
+	}
+	return strings.Join(parts, ", ")
+}
+
+func downloadCert(
 	c *gin.Context,
 	mime string,
 	b []byte,

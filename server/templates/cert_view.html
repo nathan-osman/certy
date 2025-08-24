@@ -13,11 +13,14 @@
 {% macro certname(name) %}
   {{ name.CommonName }}
   {% if name.Organization %}
-    <br />
+    &mdash;
     <span class="muted">{{ name.Organization[0] }}</span>
   {% endif %}
+  {% if name.Country or name.Province or name.Locality %}
+    <div class="muted">{{ combineAddress(name) }}</div>
+  {% endif %}
 {% endmacro %}
-<div>
+<div class="elements">
   <div class="title">
     Certificate Information
     <div class="desc">
@@ -53,7 +56,7 @@
         <td>
           {{ cert.X509.NotAfter | formatDate }}
           <span class="muted">
-            ({{ cert.X509.NotAfter.Sub(cert.X509.NotBefore) | formatDuration }})
+            (duration: {{ cert.X509.NotAfter.Sub(cert.X509.NotBefore) | formatDuration }})
           </span>
         </td>
       </tr>
@@ -84,7 +87,7 @@
     </tbody>
   </table>
 </div>
-<div>
+<div class="elements">
   <div class="title">
     Export
     <div class="desc">
@@ -105,7 +108,7 @@
   </div>
 </div>
 {% if cert.CanSign() %}
-  <div>
+  <div class="elements">
     <div class="title">
       Child Certificates
       <div class="desc">

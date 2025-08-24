@@ -219,13 +219,19 @@ func (s *Storage) ExportPrivateKeyPEM(certPath string) ([]byte, error) {
 // CreateCertificateParams provides CreateCertificate with parameters for
 // creating a new X.509 certificate and private key.
 type CreateCertificateParams struct {
-	CommonName   string
-	Organization string
-	Validity     string
-	CanSign      bool
-	ClientAuth   bool
-	ServerAuth   bool
-	SANs         string
+	CommonName         string
+	Organization       string
+	OrganizationalUnit string
+	Country            string
+	Province           string
+	Locality           string
+	StreetAddress      string
+	PostalCode         string
+	Validity           string
+	CanSign            bool
+	ClientAuth         bool
+	ServerAuth         bool
+	SANs               string
 }
 
 // CreateCertificate creates a new certificate & private key. The certificate
@@ -301,8 +307,14 @@ func (s *Storage) CreateCertificate(
 		cert = &x509.Certificate{
 			SerialNumber: big.NewInt(serial),
 			Subject: pkix.Name{
-				CommonName:   params.CommonName,
-				Organization: []string{params.Organization},
+				Country:            s.ifProvided(params.Country),
+				Organization:       s.ifProvided(params.Organization),
+				OrganizationalUnit: s.ifProvided(params.OrganizationalUnit),
+				Locality:           s.ifProvided(params.Locality),
+				Province:           s.ifProvided(params.Province),
+				StreetAddress:      s.ifProvided(params.StreetAddress),
+				PostalCode:         s.ifProvided(params.PostalCode),
+				CommonName:         params.CommonName,
 			},
 			NotBefore:             n,
 			NotAfter:              n.Add(v),

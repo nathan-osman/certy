@@ -23,17 +23,46 @@
 {% endif %}
 <div class="double">
   {{ input(form, "CommonName", "Common name", placeholder, true) }}
-  {{ input(form, "Organization", "Organization", "e.g. Your Name or MyCompany Ltd.") }}
 </div>
-{{ duration(form, "Validity", "Validity") }}
-<div>
+<div class="elements sm">
+  <div class="title">
+    Information
+    <div class="desc">
+      The information in this section is optional, though recommended.
+    </div>
+  </div>
+  <div class="double">
+    {{ input(form, "Organization", "Organization", "e.g. Your Name or MyCompany Ltd.") }}
+    {{ input(form, "OrganizationalUnit", "Organizational unit", "e.g. Research Division") }}
+  </div>
+  <div class="double">
+    {{ input(form, "Country", "Country code", "e.g. US, CA, etc.") }}
+    {{ input(form, "Province", "Province or State", "e.g. Alberta, Alaska, etc.") }}
+  </div>
+  <div class="double">
+    {{ input(form, "Locality", "City", "e.g. Atlanta, Toronto, etc.") }}
+  </div>
+  <div class="double">
+    {{ input(form, "StreetAddress", "Street address", "e.g. 1234 Park Way") }}
+    {{ input(form, "PostalCode", "Postal or zip code", "e.g. 12345") }}
+  </div>
+</div>
+<div class="elements sm">
+  <div class="title">Period</div>
+  <div class="double">
+    {{ duration(form, "Validity", "Validity") }}
+  </div>
+</div>
+<div class="elements sm">
   <div class="title">Constraints / Usage</div>
   {{ checkbox(form, "CanSign", "Can sign certificates (Certificate Authority)") }}
   {{ checkbox(form, "ClientAuth", "Client auth")}}
   {{ checkbox(form, "ServerAuth", "Server auth")}}
 </div>
-<div>
+<div class="elements sm">
   <div class="title">Extensions</div>
-  {{ domains(form, "SANs", "SANs (Subject Alternative Names)") }}
+  <div class="double">
+    {{ domains(form, "SANs", "SANs (Subject Alternative Names)") }}
+  </div>
 </div>
 {% endblock %}

@@ -78,7 +78,6 @@ a:hover {
 .content .title {
   color: var(--color-fg);
   font-size: 18pt;
-  margin-bottom: var(--spacing-elements);
 }
 
 .content .title .desc {
@@ -225,6 +224,10 @@ a:hover {
   display: flex;
   flex-direction: column;
   row-gap: var(--spacing-elements);
+}
+
+.elements.sm {
+  row-gap: var(--spacing-elements-sm);
 }
 
 .elements.lg {

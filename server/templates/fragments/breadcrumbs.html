@@ -1,15 +1,23 @@
 <div class="breadcrumbs">
   <div>Root</div>
-  {% set path = "" %}
-  {% for p in cert.Parents %}
-    {% if path %}
-      {% set path = path + "/" + p.ID %}
+  {% set p = "" %}
+  {% for c in cert.Parents %}
+    {% if p %}
+      {% set p = p + "/" + c.ID %}
     {% else %}
-      {% set path = p.ID %}
+      {% set p = c.ID %}
     {% endif %}
     <div>&raquo;</div>
-    <a href="/view?cert={{ path }}">{{ p.X509.Subject.CommonName }}</a>
+    <a href="/view?cert={{ p }}">{{ c.X509.Subject.CommonName }}</a>
   {% endfor %}
   <div>&raquo;</div>
-  <div>{{ cert.X509.Subject.CommonName }}</div>
+  {% if page %}
+    <a href="/view?cert={{ path }}">
+      {{ cert.X509.Subject.CommonName }}
+    </a>
+    <div>&raquo;</div>
+    <div>{{ page }}</div>
+  {% else %}
+    <div>{{ cert.X509.Subject.CommonName }}</div>
+  {% endif %}
 </div>

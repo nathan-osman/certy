@@ -83,6 +83,8 @@ func (s *Server) certNew(c *gin.Context) {
 	c.HTML(http.StatusOK, "templates/cert_new.html", pongo2.Context{
 		"cert": cert,
 		"form": form,
+		"path": p,
+		"page": "New",
 	})
 }
 
@@ -152,5 +154,7 @@ func (s *Server) certPKCS12(c *gin.Context) {
 	c.HTML(http.StatusOK, "templates/cert_pkcs12.html", pongo2.Context{
 		"cert": cert,
 		"form": form,
+		"path": p,
+		"page": "Export",
 	})
 }

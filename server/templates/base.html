@@ -24,6 +24,9 @@
   </div>
   <div class="container">
     <div class="content elements lg">
+      {% if cert %}
+        {% include "templates/fragments/breadcrumbs.html" %}
+      {% endif %}
       {% block content %}{% endblock %}
     </div>
   </div>

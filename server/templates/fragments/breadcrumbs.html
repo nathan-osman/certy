@@ -1,0 +1,15 @@
+<div class="breadcrumbs">
+  <div>Root</div>
+  {% set path = "" %}
+  {% for p in cert.Parents %}
+    {% if path %}
+      {% set path = path + "/" + p.ID %}
+    {% else %}
+      {% set path = p.ID %}
+    {% endif %}
+    <div>&raquo;</div>
+    <a href="/view?cert={{ path }}">{{ p.X509.Subject.CommonName }}</a>
+  {% endfor %}
+  <div>&raquo;</div>
+  <div>{{ cert.X509.Subject.CommonName }}</div>
+</div>

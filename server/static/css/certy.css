@@ -68,6 +68,12 @@ a:hover {
   font-size: 24pt;
 }
 
+.breadcrumbs {
+  color: var(--color-muted);
+  column-gap: var(--spacing-elements-sm);
+  display: flex;
+}
+
 .content .title {
   color: var(--color-fg);
   font-size: 18pt;

@@ -3,10 +3,14 @@ package server
 import (
 	"errors"
 	"fmt"
+	"net/http"
+	"strconv"
 	"strings"
 	"time"
 
 	"github.com/flosch/pongo2/v6"
+	"github.com/gin-gonic/gin"
+	"github.com/nathan-osman/certy/storage"
 )
 
 const (
@@ -65,4 +69,29 @@ func formatDuration(in *pongo2.Value, param *pongo2.Value) (*pongo2.Value, *pong
 	return pongo2.AsValue(
 		vStr,
 	), nil
+}
+
+func (s *Server) downloadCert(
+	c *gin.Context,
+	mime string,
+	b []byte,
+	cert *storage.Certificate,
+	suffix, extension string,
+) {
+	v := strings.ReplaceAll(
+		cert.X509.Subject.CommonName,
+		" ",
+		"_",
+	)
+	c.Header(
+		"Content-Disposition",
+		fmt.Sprintf(
+			`attachment; filename="%s%s.%s"`,
+			v,
+			suffix,
+			extension,
+		),
+	)
+	c.Header("Content-Length", strconv.Itoa(len(b)))
+	c.Data(http.StatusOK, mime, b)
 }

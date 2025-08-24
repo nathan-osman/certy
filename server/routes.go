@@ -1,13 +1,17 @@
 package server
 
 import (
+	"errors"
 	"fmt"
 	"net/http"
-	"strconv"
 
 	"github.com/flosch/pongo2/v6"
 	"github.com/gin-gonic/gin"
 	"github.com/nathan-osman/certy/storage"
+)
+
+var (
+	errInvalidAction = errors.New("invalid action specified")
 )
 
 func (s *Server) errorHandler(c *gin.Context, err any) {
@@ -77,6 +81,45 @@ func (s *Server) certNew(c *gin.Context) {
 	})
 }
 
+func (s *Server) certAction(c *gin.Context) {
+	var (
+		p    = c.Query("cert")
+		cert *storage.Certificate
+	)
+	if p != "" {
+		v, err := s.storage.GetCertificate(p)
+		if err != nil {
+			panic(err)
+		}
+		cert = v
+	}
+	var (
+		b         []byte
+		err       error
+		suffix    string
+		extension = "pem"
+	)
+	switch c.Query("action") {
+	case "export_cert_pem":
+		b, err = s.storage.ExportCertificatePEM(p)
+	case "export_chain_pem":
+		b, err = s.storage.ExportCertificateChainPEM(p)
+		suffix = "-chain"
+	case "export_pub_key":
+		b, err = s.storage.ExportPublicKeyPEM(p)
+		extension = "pub"
+	case "export_priv_key":
+		b, err = s.storage.ExportPrivateKeyPEM(p)
+		extension = "key"
+	default:
+		panic(errInvalidAction)
+	}
+	if err != nil {
+		panic(err)
+	}
+	s.downloadCert(c, "application/x-pem-file", b, cert, suffix, extension)
+}
+
 func (s *Server) certPKCS12(c *gin.Context) {
 	var (
 		p    = c.Query("cert")
@@ -98,15 +141,7 @@ func (s *Server) certPKCS12(c *gin.Context) {
 		if err != nil {
 			panic(err)
 		}
-		c.Header(
-			"Content-Disposition",
-			fmt.Sprintf(
-				`attachment; filename="%s.p12"`,
-				cert.X509.Subject.CommonName,
-			),
-		)
-		c.Header("Content-Length", strconv.Itoa(len(b)))
-		c.Data(http.StatusOK, "application/x-pkcs12", b)
+		s.downloadCert(c, "application/x-pkcs12", b, cert, "", "p12")
 		return
 	}
 	c.HTML(http.StatusOK, "templates/cert_pkcs12.html", pongo2.Context{

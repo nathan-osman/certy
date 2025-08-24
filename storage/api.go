@@ -22,9 +22,10 @@ type Ref struct {
 // Certificate represents an X.509 certificate in a format suitable for
 // rendering to templates.
 type Certificate struct {
-	Parents  []*Ref
-	X509     *x509.Certificate
-	Children []*Ref
+	Parents     []*Ref
+	Fingerprint string
+	X509        *x509.Certificate
+	Children    []*Ref
 }
 
 func parentList(p *storageCert) []*Ref {
@@ -54,9 +55,10 @@ func childList(m map[string]*storageCert) []*Ref {
 
 func convertCert(cert *storageCert) *Certificate {
 	return &Certificate{
-		Parents:  parentList(cert.parent),
-		X509:     cert.cert,
-		Children: childList(cert.children),
+		Parents:     parentList(cert.parent),
+		Fingerprint: cert.fingerprint,
+		X509:        cert.cert,
+		Children:    childList(cert.children),
 	}
 }
 

@@ -1,8 +1,6 @@
 {# Render an action (form) button #}
 {% macro action(cert, name, label) export %}
-  <form method="post" action="action">
-    <input type="hidden" name="cert" value="{{ cert }}" />
-    <input type="hidden" name="action" value="{{ name }}" />
+  <form method="post" action="/action?cert={{ cert }}&action={{ name }}">
     <button type="submit" class="button primary">
       {{ label }}
     </button>

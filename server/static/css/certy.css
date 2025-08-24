@@ -69,7 +69,7 @@ a:hover {
 }
 
 .content .title {
-  color: var(--color-primary);
+  color: var(--color-fg);
   font-size: 18pt;
   margin-bottom: var(--spacing-elements);
 }
@@ -179,6 +179,7 @@ a:hover {
 .line {
   background-color: var(--color-fg);
   height: 2px;
+  margin: var(--spacing-elements-sm) 0;
 }
 
 .muted {

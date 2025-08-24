@@ -13,7 +13,8 @@
 {% macro certname(name) %}
   {{ name.CommonName }}
   {% if name.Organization %}
-    <span class="muted">&mdash; ({{ name.Organization[0] }})</span>
+    <br />
+    <span class="muted">{{ name.Organization[0] }}</span>
   {% endif %}
 {% endmacro %}
 <div>
@@ -26,16 +27,18 @@
   <table class="table">
     <tbody>
       <tr>
-        <th>Common Name:</th>
-        <td>
-          {{ certname(cert.X509.Subject) }}
+        <th>SHA-256 Fingerprint:</th>
+        <td title="{{ cert.Fingerprint }}">
+          {{ cert.Fingerprint|truncatechars:20 }}&mldr;
         </td>
       </tr>
       <tr>
+        <th>Common Name:</th>
+        <td>{{ certname(cert.X509.Subject) }}</td>
+      </tr>
+      <tr>
         <th>Issued By:</th>
-        <td>
-          {{ certname(cert.X509.Issuer) }}
-        </td>
+        <td>{{ certname(cert.X509.Issuer) }}</td>
       </tr>
       <tr>
         <th>Valid from:</th>

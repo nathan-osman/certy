@@ -75,9 +75,10 @@ func New(cfg *Config) (*Server, error) {
 	// Handle errors gracefully
 	r.Use(gin.CustomRecovery(s.errorHandler))
 
-	// TODO: not do this
+	// Routes for the server
 	r.GET("/", s.index)
 	r.GET("/view", s.certView)
+	r.POST("/action", s.certAction)
 	r.Match(formMethods, "/new", s.certNew)
 	r.Match(formMethods, "/pkcs12", s.certPKCS12)
 

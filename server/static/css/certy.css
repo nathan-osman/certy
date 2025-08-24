@@ -168,6 +168,11 @@ a:hover {
   border-color: var(--color-fg);
 }
 
+.double {
+  display: grid;
+  gap: var(--spacing-elements);
+}
+
 .input {
   border-color: var(--color-primary);
   display: block;
@@ -252,6 +257,14 @@ a:hover {
   .container {
     margin: auto;
     width: 720px;
+  }
+
+  .double {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .double .input {
+    width: 100%;
   }
 
   .input {

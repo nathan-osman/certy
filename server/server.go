@@ -31,6 +31,7 @@ var (
 func init() {
 	pongo2.RegisterFilter("formatBytes", formatBytes)
 	pongo2.RegisterFilter("formatDate", formatDate)
+	pongo2.RegisterFilter("formatDuration", formatDuration)
 }
 
 // Server provides the web interface for interacting with the CA and
@@ -78,6 +79,7 @@ func New(cfg *Config) (*Server, error) {
 	r.GET("/", s.index)
 	r.GET("/view", s.certView)
 	r.Match(formMethods, "/new", s.certNew)
+	r.Match(formMethods, "/pkcs12", s.certPKCS12)
 
 	// Static files
 	f, err := static.EmbedFolder(staticFS, "static")

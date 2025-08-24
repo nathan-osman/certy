@@ -10,8 +10,65 @@
 {% endblock %}
 
 {% block content %}
-{% if cert.Children %}
+<div>
+  <div class="title">
+    Certificate Information
+    <div class="desc">
+      The table below lists the properties of the X.509 certificate below.
+    </div>
+  </div>
+  <table class="table">
+    <tbody>
+      <tr>
+        <th>Common Name:</th>
+        <td>{{ cert.X509.Subject.CommonName }}</td>
+      </tr>
+      <tr>
+        <th>Issued By:</th>
+        <td>{{ cert.X509.Issuer.CommonName }}</td>
+      </tr>
+      <tr>
+        <th>Valid from:</th>
+        <td>{{ cert.X509.NotBefore | formatDate }}</td>
+      </tr>
+      <tr>
+        <th>Valid to:</th>
+        <td>
+          {{ cert.X509.NotAfter | formatDate }}
+          <span class="muted">
+            ({{ cert.X509.NotAfter.Sub(cert.X509.NotBefore) | formatDuration }})
+          </span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+<div>
+  <div class="title">
+    Export
+    <div class="desc">
+      Choose a format below to export the certificate and / or private key.
+    </div>
+  </div>
+  <div class="buttons">
+    {% import 'templates/macros/action.html' action %}
+    {{ action(path, "export_cert_pem", "Cert (PEM)") }}
+    <a href="/pkcs12?cert={{ path }}" class="button primary">
+      PKCS#12
+    </a>
+    {{ action(path, "export_chain_pem", "Chain") }}
+    {{ action(path, "export_pub_key", "Pubkey") }}
+    {{ action(path, "export_priv_key", "Priv. Key") }}
+  </div>
+</div>
+<div>
+  <div class="title">
+    Child Certificates
+    <div class="desc">
+      Certificates signed by this one are displayed below.
+    </div>
+  </div>
   {% import 'templates/macros/table.html' ref_table %}
   {{ ref_table(path, cert.Children) }}
-{% endif %}
+</div>
 {% endblock %}

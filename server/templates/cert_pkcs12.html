@@ -1,0 +1,15 @@
+{% extends "templates/form.html" %}
+
+{% block title %}Export PKCS#12{% endblock %}
+
+{% block header %}
+<div class="title">Export PKCS#12</div>
+<div class="desc">
+  Export {{ cert.X509.Subject.CommonName }} and its private key in PKCS#12 format
+</div>
+{% endblock %}
+
+{% block fields %}
+{% import 'templates/macros/form.html' form_input %}
+{{ form_input(form, "Password", "Password", "e.g. SuperSecret123!", true) }}
+{% endblock %}

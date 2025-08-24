@@ -3,33 +3,35 @@
   {% if path %}
     {% set path = prefix + "/" %}
   {% endif %}
-  <table class="table bordered">
-    <thead>
-      <tr>
-        <th>Common Name</th>
-        <th>Issued</th>
-        <th>Expires</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for r in refs %}
+  <div class="elements">
+    <table class="table">
+      <thead>
         <tr>
-          <th>
-            <a href="/view?cert={{ path }}{{ r.ID }}">
-              {{ r.X509.Subject.CommonName}}
-            </a>
-          </th>
-          <td>{{ r.X509.NotBefore | formatDate }}</td>
-          <td>{{ r.X509.NotAfter | formatDate }}</td>
+          <th>Common Name</th>
+          <th>Issued</th>
+          <th>Expires</th>
         </tr>
-      {% empty %}
-        <tr>
-          <td colspan="3" class="empty">No certificates!</td>
-        </tr>
-      {% endfor %}
-    </tbody>
-  </table>
-  <div class="buttons">
-    <a href="/new?cert={{ prefix }}" class="button primary">Create New</a>
+      </thead>
+      <tbody>
+        {% for r in refs %}
+          <tr>
+            <th>
+              <a href="/view?cert={{ path }}{{ r.ID }}">
+                {{ r.X509.Subject.CommonName}}
+              </a>
+            </th>
+            <td>{{ r.X509.NotBefore | formatDate }}</td>
+            <td>{{ r.X509.NotAfter | formatDate }}</td>
+          </tr>
+        {% empty %}
+          <tr>
+            <td colspan="3" class="empty muted">No certificates!</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    <div class="buttons">
+      <a href="/new?cert={{ prefix }}" class="button primary">Create New</a>
+    </div>
   </div>
 {% endmacro %}

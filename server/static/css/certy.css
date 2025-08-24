@@ -14,11 +14,12 @@
   --color-muted: #808080;
 
   --padding-control: 8px 24px;
-  --padding-control-sm: 12px;
+  --padding-control-sm: 8px 12px;
   --padding-panel: 16px 0;
   --padding-panel-lg: 32px 0;
 
   --spacing-elements: 16px;
+  --spacing-elements-sm: 8px;
   --spacing-elements-lg: 32px;
 }
 
@@ -67,6 +68,17 @@ a:hover {
   font-size: 24pt;
 }
 
+.content .title {
+  color: var(--color-primary);
+  font-size: 18pt;
+  margin-bottom: var(--spacing-elements);
+}
+
+.content .title .desc {
+  color: var(--color-muted);
+  font-size: initial;
+}
+
 /* Form class styles */
 
 .button,
@@ -98,18 +110,12 @@ a:hover {
 }
 
 .buttons {
+  column-gap: var(--spacing-elements);
   display: flex;
-  margin: var(--spacing-elements) 0;
-}
-
-.fields {
-  display: flex;
-  flex-direction: column;
-  margin: var(--spacing-elements) 0;
-  row-gap: var(--spacing-elements);
 }
 
 .input {
+  border-color: var(--color-primary);
   display: block;
   padding: var(--padding-control-sm);
   width: 100%;
@@ -119,7 +125,9 @@ a:hover {
 
 .table {
   border-collapse: collapse;
-  margin: var(--spacing-elements) 0;
+}
+
+.table.bordered {
   width: 100%;
 }
 
@@ -144,7 +152,6 @@ a:hover {
 }
 
 .table .empty {
-  opacity: 0.5;
   padding: var(--padding-panel-lg);
   text-align: center;
 }
@@ -155,8 +162,23 @@ a:hover {
   margin: auto var(--spacing-elements);
 }
 
+.elements {
+  display: flex;
+  flex-direction: column;
+  row-gap: var(--spacing-elements);
+}
+
+.elements.lg {
+  row-gap: var(--spacing-elements-lg);
+}
+
 .error {
   color: var(--color-danger);
+}
+
+.line {
+  background-color: var(--color-fg);
+  height: 2px;
 }
 
 .muted {

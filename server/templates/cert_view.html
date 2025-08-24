@@ -33,6 +33,10 @@
         </td>
       </tr>
       <tr>
+        <th>Serial</th>
+        <td>{{ cert.X509.SerialNumber }}</td>
+      </tr>
+      <tr>
         <th>Common name:</th>
         <td>{{ certname(cert.X509.Subject) }}</td>
       </tr>

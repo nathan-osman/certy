@@ -8,7 +8,9 @@ import (
 	"math/big"
 	"os"
 	"path/filepath"
+	"strings"
 	"time"
+	"unicode"
 
 	"software.sslmate.com/src/go-pkcs12"
 )
@@ -26,6 +28,11 @@ type Certificate struct {
 	Fingerprint string
 	X509        *x509.Certificate
 	Children    []*Ref
+}
+
+// CanSign indicates whether this certificate may sign others.
+func (c *Certificate) CanSign() bool {
+	return c.X509.IsCA && c.X509.KeyUsage&x509.KeyUsageCertSign != 0
 }
 
 func parentList(p *storageCert) []*Ref {
@@ -193,6 +200,10 @@ type CreateCertificateParams struct {
 	CommonName   string
 	Organization string
 	Validity     string
+	CanSign      bool
+	ClientAuth   bool
+	ServerAuth   bool
+	SANs         string
 }
 
 // CreateCertificate creates a new certificate & private key. The certificate
@@ -273,10 +284,9 @@ func (s *Storage) CreateCertificate(
 			},
 			NotBefore:             n,
 			NotAfter:              n.Add(v),
-			KeyUsage:              x509.KeyUsageDigitalSignature,
 			ExtKeyUsage:           []x509.ExtKeyUsage{x509.ExtKeyUsageClientAuth},
 			BasicConstraintsValid: true,
-			IsCA:                  p == nil,
+			IsCA:                  params.CanSign,
 		}
 	)
 
@@ -285,6 +295,41 @@ func (s *Storage) CreateCertificate(
 	parentCert := cert
 	if p != nil {
 		parentCert = p.cert
+	}
+
+	// Set the flags
+	if params.CanSign {
+		cert.KeyUsage |= x509.KeyUsageCertSign
+	}
+	if params.ClientAuth {
+		cert.KeyUsage |= x509.KeyUsageDigitalSignature
+		cert.ExtKeyUsage = append(
+			cert.ExtKeyUsage,
+			x509.ExtKeyUsageClientAuth,
+		)
+	}
+	if params.ServerAuth {
+		cert.KeyUsage |=
+			x509.KeyUsageDigitalSignature &
+				x509.KeyUsageKeyEncipherment
+		cert.ExtKeyUsage = append(
+			cert.ExtKeyUsage,
+			x509.ExtKeyUsageServerAuth,
+		)
+	}
+
+	// If SANs were provided (usually required for web servers), include them
+	// as well
+	if params.SANs != "" {
+		cert.DNSNames = append(
+			cert.DNSNames,
+			strings.FieldsFunc(
+				params.SANs,
+				func(c rune) bool {
+					return c == ',' || unicode.IsSpace(c)
+				},
+			)...,
+		)
 	}
 
 	// FINALLY, create the actual certificate

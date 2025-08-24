@@ -53,6 +53,22 @@
           </span>
         </td>
       </tr>
+      <tr>
+        <th>Can sign certificates:</th>
+        <td>
+          {% if cert.CanSign() %}yes{% else %}no{% endif %}
+        </td>
+      </tr>
+      {% if cert.X509.DNSNames %}
+        <tr>
+          <th>SANs:</th>
+          <td>
+            {% for n in cert.X509.DNSNames %}
+              <div>{{ n }}</div>
+            {% endfor %}
+          </td>
+        </tr>
+      {% endif %}
     </tbody>
   </table>
 </div>
@@ -76,14 +92,16 @@
     {{ action(path, "export_priv_key", "Priv. Key") }}
   </div>
 </div>
-<div>
-  <div class="title">
-    Child Certificates
-    <div class="desc">
-      Certificates signed by this one are displayed below.
+{% if cert.CanSign() %}
+  <div>
+    <div class="title">
+      Child Certificates
+      <div class="desc">
+        Certificates signed by this one are displayed below.
+      </div>
     </div>
+    {% import 'templates/macros/table.html' ref_table %}
+    {{ ref_table(path, cert.Children) }}
   </div>
-  {% import 'templates/macros/table.html' ref_table %}
-  {{ ref_table(path, cert.Children) }}
-</div>
+{% endif %}
 {% endblock %}

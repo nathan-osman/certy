@@ -1,5 +1,5 @@
 {# Display a text input #}
-{% macro form_input(form, name, label, placeholder="", autofocus=false) export %}
+{% macro input(form, name, label, placeholder="", autofocus=false) export %}
   {% if autofocus %}
     {% set autofocus = "autofocus" %}
   {% else %}
@@ -18,6 +18,30 @@
   </label>
 {% endmacro %}
 
-{% macro form_duration(form, name, label) export %}
-  {{ form_input(form, name, label, "e.g. 3y, 4w, 90d, etc.") }}
+{# Display a text input for entering a duration #}
+{% macro duration(form, name, label) export %}
+  {{ input(form, name, label, "e.g. 3y, 4w, 90d, etc.") }}
+{% endmacro %}
+
+{# Display a comma-separated list of domain names #}
+{% macro domains(form, name, label) export %}
+  <div>
+    {{ input(form, name, label, "e.g. a.com, www.a.com, etc.") }}
+    <div class="muted small">
+      Most HTTP clients require all valid domain names to be listed here
+    </div>
+  </div>
+{% endmacro %}
+
+{# Display a checkbox #}
+{% macro checkbox(form, name, label) export %}
+  <label class="checkbox">
+    <input
+      type="checkbox"
+      name="{{ name }}"
+      value="true"
+      {% if form[name] %}checked{% endif %}
+      />
+    {{ label }}
+  </label>
 {% endmacro %}

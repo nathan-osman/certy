@@ -56,10 +56,6 @@ func (s *Server) certNew(c *gin.Context) {
 			panic(err)
 		}
 		cert = v
-		org := cert.X509.Subject.Organization
-		if len(org) > 0 {
-			form.Organization = org[0]
-		}
 	}
 	if c.Request.Method == http.MethodPost {
 		if err := c.ShouldBind(form); err != nil {
@@ -74,6 +70,15 @@ func (s *Server) certNew(c *gin.Context) {
 			fmt.Sprintf("/view?cert=%s", v),
 		)
 		return
+	} else {
+		if cert != nil {
+			org := cert.X509.Subject.Organization
+			if len(org) > 0 {
+				form.Organization = org[0]
+			}
+		} else {
+			form.CanSign = true
+		}
 	}
 	c.HTML(http.StatusOK, "templates/cert_new.html", pongo2.Context{
 		"cert": cert,

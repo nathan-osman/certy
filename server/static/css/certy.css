@@ -114,6 +114,46 @@ a:hover {
   display: flex;
 }
 
+.checkbox {
+  align-items: center;
+  cursor: pointer;
+  display: flex;
+  column-gap: 4px;
+}
+
+.checkbox input {
+  height: 16px;
+  left: -9999px;
+  position: relative;
+  width: 16px;
+}
+
+.checkbox input:before,
+.checkbox input:after {
+  content: '';
+  left: 9999px;
+  position: absolute;
+}
+
+.checkbox input:before {
+  background-color: var(--color-panel);
+  border: 2px solid var(--color-primary);
+  display: inline-block;
+  height: 12px;
+  width: 12px;
+}
+
+.checkbox input:checked:after {
+  background-color: var(--color-fg);
+  height: 8px;
+  margin: 4px;
+  width: 8px;
+}
+
+.checkbox input:focus:before {
+  border-color: var(--color-fg);
+}
+
 .input {
   border-color: var(--color-primary);
   display: block;
@@ -184,6 +224,10 @@ a:hover {
 
 .muted {
   color: var(--color-muted);
+}
+
+.small {
+  font-size: small;
 }
 
 @media (min-width: 800px) {

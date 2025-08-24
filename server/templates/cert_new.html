@@ -15,13 +15,23 @@
 {% endblock %}
 
 {% block fields %}
-{% import 'templates/macros/form.html' form_duration, form_input %}
+{% import 'templates/macros/form.html' checkbox, domains, duration, input %}
 {% if cert %}
-  {% set placeholder = "e.g. Intermediate CA" %}
+  {% set placeholder = "e.g. Intermediate CA, www.example.com" %}
 {% else %}
   {% set placeholder = "e.g. John Smith's Root CA" %}
 {% endif %}
-{{ form_input(form, "CommonName", "Common name", placeholder, true) }}
-{{ form_input(form, "Organization", "Organization", "e.g. Your Name or MyCompany Ltd.") }}
-{{ form_duration(form, "Validity", "Validity") }}
+{{ input(form, "CommonName", "Common name", placeholder, true) }}
+{{ input(form, "Organization", "Organization", "e.g. Your Name or MyCompany Ltd.") }}
+{{ duration(form, "Validity", "Validity") }}
+<div>
+  <div class="title">Constraints / Usage</div>
+  {{ checkbox(form, "CanSign", "Can sign certificates (Certificate Authority)") }}
+  {{ checkbox(form, "ClientAuth", "Client auth")}}
+  {{ checkbox(form, "ServerAuth", "Server auth")}}
+</div>
+<div>
+  <div class="title">Extensions</div>
+  {{ domains(form, "SANs", "SANs (Subject Alternative Names)") }}
+</div>
 {% endblock %}

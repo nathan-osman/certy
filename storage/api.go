@@ -191,9 +191,13 @@ func (s *Storage) ExportPublicKeyPEM(certPath string) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
+	b, err := x509.MarshalPKIXPublicKey(&k.PublicKey)
+	if err != nil {
+		return nil, err
+	}
 	return pem.EncodeToMemory(&pem.Block{
 		Type:  typePublicKey,
-		Bytes: x509.MarshalPKCS1PublicKey(&k.PublicKey),
+		Bytes: b,
 	}), nil
 }
 

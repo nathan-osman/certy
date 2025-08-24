@@ -10,14 +10,15 @@ import (
 )
 
 const (
-	typePrivateKey = "RSA PRIVATE KEY"
+	typePrivateKey = "PRIVATE KEY"
 	typePublicKey  = "PUBLIC KEY"
 
 	filenamePrivateKey = "key.pem"
 )
 
 var (
-	errNotAPrivateKey = errors.New("file is not a PEM-encoded private key")
+	errNotAPrivateKey = errors.New("file is not a PKCS#8 private key")
+	errNotAnRSAKey    = errors.New("file is not an RSA private key")
 )
 
 func generatePrivateKey(filename string) (*rsa.PrivateKey, error) {
@@ -25,16 +26,20 @@ func generatePrivateKey(filename string) (*rsa.PrivateKey, error) {
 	if err != nil {
 		return nil, err
 	}
-	b := pem.EncodeToMemory(&pem.Block{
+	b, err := x509.MarshalPKCS8PrivateKey(p)
+	if err != nil {
+		return nil, err
+	}
+	block := pem.EncodeToMemory(&pem.Block{
 		Type:  typePrivateKey,
-		Bytes: x509.MarshalPKCS1PrivateKey(p),
+		Bytes: b,
 	})
 	f, err := os.OpenFile(filename, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0600)
 	if err != nil {
 		return nil, err
 	}
 	defer f.Close()
-	if _, err := f.Write(b); err != nil {
+	if _, err := f.Write(block); err != nil {
 		return nil, err
 	}
 	return p, nil
@@ -49,5 +54,13 @@ func loadPrivateKey(filename string) (*rsa.PrivateKey, error) {
 	if block == nil || block.Type != typePrivateKey {
 		return nil, errNotAPrivateKey
 	}
-	return x509.ParsePKCS1PrivateKey(block.Bytes)
+	k, err := x509.ParsePKCS8PrivateKey(block.Bytes)
+	if err != nil {
+		return nil, err
+	}
+	v, ok := k.(*rsa.PrivateKey)
+	if !ok {
+		return nil, errNotAnRSAKey
+	}
+	return v, err
 }

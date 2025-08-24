@@ -22,5 +22,6 @@
   {% set placeholder = "e.g. John Smith's Root CA" %}
 {% endif %}
 {{ form_input(form, "CommonName", "Common name", placeholder, true) }}
+{{ form_input(form, "Organization", "Organization", "e.g. Your Name or MyCompany Ltd.") }}
 {{ form_duration(form, "Validity", "Validity") }}
 {% endblock %}

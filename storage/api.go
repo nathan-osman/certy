@@ -188,8 +188,9 @@ func (s *Storage) ExportPrivateKeyPEM(certPath string) ([]byte, error) {
 // CreateCertificateParams provides CreateCertificate with parameters for
 // creating a new X.509 certificate and private key.
 type CreateCertificateParams struct {
-	CommonName string
-	Validity   string
+	CommonName   string
+	Organization string
+	Validity     string
 }
 
 // CreateCertificate creates a new certificate & private key. The certificate
@@ -265,7 +266,8 @@ func (s *Storage) CreateCertificate(
 		cert = &x509.Certificate{
 			SerialNumber: big.NewInt(serial),
 			Subject: pkix.Name{
-				CommonName: params.CommonName,
+				CommonName:   params.CommonName,
+				Organization: []string{params.Organization},
 			},
 			NotBefore:             n,
 			NotAfter:              n.Add(v),

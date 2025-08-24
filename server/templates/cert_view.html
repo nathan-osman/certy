@@ -10,6 +10,12 @@
 {% endblock %}
 
 {% block content %}
+{% macro certname(name) %}
+  {{ name.CommonName }}
+  {% if name.Organization %}
+    <span class="muted">&mdash; ({{ name.Organization[0] }})</span>
+  {% endif %}
+{% endmacro %}
 <div>
   <div class="title">
     Certificate Information
@@ -21,11 +27,15 @@
     <tbody>
       <tr>
         <th>Common Name:</th>
-        <td>{{ cert.X509.Subject.CommonName }}</td>
+        <td>
+          {{ certname(cert.X509.Subject) }}
+        </td>
       </tr>
       <tr>
         <th>Issued By:</th>
-        <td>{{ cert.X509.Issuer.CommonName }}</td>
+        <td>
+          {{ certname(cert.X509.Issuer) }}
+        </td>
       </tr>
       <tr>
         <th>Valid from:</th>

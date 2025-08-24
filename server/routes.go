@@ -52,6 +52,10 @@ func (s *Server) certNew(c *gin.Context) {
 			panic(err)
 		}
 		cert = v
+		org := cert.X509.Subject.Organization
+		if len(org) > 0 {
+			form.Organization = org[0]
+		}
 	}
 	if c.Request.Method == http.MethodPost {
 		if err := c.ShouldBind(form); err != nil {

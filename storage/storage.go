@@ -2,6 +2,7 @@ package storage
 
 import (
 	"log/slog"
+	"os"
 	"path/filepath"
 	"sync"
 )
@@ -37,6 +38,9 @@ func New(cfg *Config) (*Storage, error) {
 	s := &Storage{
 		logger:  cfg.Logger,
 		certDir: filepath.Join(cfg.DataDir, "certs"),
+	}
+	if err := os.MkdirAll(s.certDir, 0600); err != nil {
+		return nil, err
 	}
 	if s.logger == nil {
 		s.logger = slog.Default()

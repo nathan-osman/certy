@@ -93,21 +93,34 @@ func (s *Server) certNew(c *gin.Context) {
 	})
 }
 
+func (s *Server) certValidate(c *gin.Context) {
+	p := c.Query("cert")
+	v, err := s.storage.GetCertificate(p)
+	if err != nil {
+		panic(err)
+	}
+	var msg string
+	if err := s.storage.ValidateCertificate(
+		c.Query("cert"),
+	); err != nil {
+		msg = err.Error()
+	}
+	c.HTML(http.StatusOK, "templates/cert_validate.html", pongo2.Context{
+		"cert": v,
+		"path": p,
+		"msg":  msg,
+		"page": "Validation",
+	})
+}
+
 func (s *Server) certAction(c *gin.Context) {
-	var (
-		p    = c.Query("cert")
-		cert *storage.Certificate
-	)
-	if p != "" {
-		v, err := s.storage.GetCertificate(p)
-		if err != nil {
-			panic(err)
-		}
-		cert = v
+	p := c.Query("cert")
+	v, err := s.storage.GetCertificate(p)
+	if err != nil {
+		panic(err)
 	}
 	var (
 		b         []byte
-		err       error
 		suffix    string
 		extension string
 	)
@@ -131,21 +144,17 @@ func (s *Server) certAction(c *gin.Context) {
 	if err != nil {
 		panic(err)
 	}
-	downloadCert(c, "application/x-pem-file", b, cert, suffix, extension)
+	downloadCert(c, "application/x-pem-file", b, v, suffix, extension)
 }
 
 func (s *Server) certPKCS12(c *gin.Context) {
 	var (
 		p    = c.Query("cert")
-		cert *storage.Certificate
 		form = &storage.ExportCertificatePKCS12Params{}
 	)
-	if p != "" {
-		v, err := s.storage.GetCertificate(p)
-		if err != nil {
-			panic(err)
-		}
-		cert = v
+	v, err := s.storage.GetCertificate(p)
+	if err != nil {
+		panic(err)
 	}
 	if c.Request.Method == http.MethodPost {
 		if err := c.ShouldBind(form); err != nil {
@@ -155,11 +164,11 @@ func (s *Server) certPKCS12(c *gin.Context) {
 		if err != nil {
 			panic(err)
 		}
-		downloadCert(c, "application/x-pkcs12", b, cert, "", "p12")
+		downloadCert(c, "application/x-pkcs12", b, v, "", "p12")
 		return
 	}
 	c.HTML(http.StatusOK, "templates/cert_pkcs12.html", pongo2.Context{
-		"cert": cert,
+		"cert": v,
 		"form": form,
 		"path": p,
 		"page": "Export",

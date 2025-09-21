@@ -109,6 +109,22 @@ func (s *Storage) GetCertificate(certPath string) (*Certificate, error) {
 	return convertCert(c), nil
 }
 
+// ValidateCertificate attempts to validate the specified certificate.
+func (s *Storage) ValidateCertificate(certPath string) error {
+	s.mutex.RLock()
+	defer s.mutex.RUnlock()
+	c, _, err := s.getCert(certPath)
+	if err != nil {
+		return err
+	}
+	if _, err := c.cert.Verify(x509.VerifyOptions{
+		KeyUsages: []x509.ExtKeyUsage{x509.ExtKeyUsageAny},
+	}); err != nil {
+		return err
+	}
+	return nil
+}
+
 // ExportCertificatePEM exports the specified certificate as a PEM-encoded
 // file.
 func (s *Storage) ExportCertificatePEM(certPath string) ([]byte, error) {

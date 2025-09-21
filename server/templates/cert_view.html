@@ -10,6 +10,7 @@
 {% endblock %}
 
 {% block content %}
+{% import 'templates/macros/action.html' action %}
 {% macro certname(name) %}
   {{ name.CommonName }}
   {% if name.Organization %}
@@ -86,6 +87,11 @@
       {% endif %}
     </tbody>
   </table>
+  <form method="post" action="/validate?cert={{ path }}" class="buttons">
+    <button type="submit" class="button primary">
+      Validate
+    </button>
+  </form>
 </div>
 <div class="elements">
   <div class="title">
@@ -95,7 +101,6 @@
     </div>
   </div>
   <div class="buttons">
-    {% import 'templates/macros/action.html' action %}
     {{ action(path, "export_cert_pem", "Cert (PEM)") }}
     <a href="/pkcs12?cert={{ path }}" class="button primary">
       PKCS#12

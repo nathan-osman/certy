@@ -78,6 +78,7 @@ func New(cfg *Config) (*Server, error) {
 	// Routes for the server
 	r.GET("/", s.index)
 	r.GET("/view", s.certView)
+	r.POST("/validate", s.certValidate)
 	r.POST("/action", s.certAction)
 	r.Match(formMethods, "/new", s.certNew)
 	r.Match(formMethods, "/pkcs12", s.certPKCS12)

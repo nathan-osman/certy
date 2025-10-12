@@ -25,7 +25,7 @@ RUN go build -v -o certy
 FROM scratch
 
 # Copy the binary
-COPY --from=0 /usr/src/app/certy /usr/local/bin
+COPY --from=0 /usr/src/app/certy /usr/local/bin/
 
 # Specify /data for data file storage
 ENV DATA_DIR=/data

@@ -6,6 +6,7 @@ import (
 	"encoding/pem"
 	"fmt"
 	"math/big"
+	"net"
 	"os"
 	"path/filepath"
 	"strings"
@@ -377,17 +378,21 @@ func (s *Storage) CreateCertificate(
 	}
 
 	// If SANs were provided (usually required for web servers), include them
-	// as well
+	// as well; check each value to see if it is an IP address or domain
 	if params.SANs != "" {
-		cert.DNSNames = append(
-			cert.DNSNames,
-			strings.FieldsFunc(
-				params.SANs,
-				func(c rune) bool {
-					return c == ',' || unicode.IsSpace(c)
-				},
-			)...,
-		)
+		for _, v := range strings.FieldsFunc(
+			params.SANs,
+			func(c rune) bool {
+				return c == ',' || unicode.IsSpace(c)
+			},
+		) {
+			i := net.ParseIP(v)
+			if i != nil {
+				cert.IPAddresses = append(cert.IPAddresses, i)
+			} else {
+				cert.DNSNames = append(cert.DNSNames, v)
+			}
+		}
 	}
 
 	// FINALLY, create the actual certificate

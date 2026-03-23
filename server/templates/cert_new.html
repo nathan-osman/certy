@@ -3,8 +3,8 @@
 {% block title %}New Certificate{% endblock %}
 
 {% block header %}
-<div class="title">New Certificate</div>
-<div class="desc">
+<h2>New Certificate</h2>
+<div>
   Create a new
   {% if cert %}
     certificate signed by {{ cert.X509.Subject.CommonName }}
@@ -21,48 +21,40 @@
 {% else %}
   {% set placeholder = "e.g. John Smith's Root CA" %}
 {% endif %}
-<div class="double">
-  {{ input(form, "CommonName", "Common name", placeholder, true) }}
-</div>
-<div class="elements sm">
-  <div class="title">
-    Information
-    <div class="desc">
-      The information in this section is optional, though recommended.
-    </div>
-  </div>
-  <div class="double">
+
+{{ input(form, "CommonName", "Common name", placeholder, true) }}
+
+<div class="card mb-3">
+  <div class="card-header">Information</div>
+  <div class="card-body">
+    <p class="bg-body-tertiary border border-secondary-subtle rounded p-3">The information in this section is optional, though recommended.</p>
     {{ input(form, "Organization", "Organization", "e.g. Your Name or MyCompany Ltd.") }}
     {{ input(form, "OrganizationalUnit", "Organizational unit", "e.g. Research Division") }}
-  </div>
-  <div class="double">
     {{ input(form, "Country", "Country code", "e.g. US, CA, etc.") }}
     {{ input(form, "Province", "Province or State", "e.g. Alberta, Alaska, etc.") }}
-  </div>
-  <div class="double">
     {{ input(form, "Locality", "City", "e.g. Atlanta, Toronto, etc.") }}
-  </div>
-  <div class="double">
     {{ input(form, "StreetAddress", "Street address", "e.g. 1234 Park Way") }}
     {{ input(form, "PostalCode", "Postal or zip code", "e.g. 12345") }}
   </div>
 </div>
-<div class="elements sm">
-  <div class="title">Period</div>
-  <div class="double">
-    {{ duration(form, "Validity", "Validity") }}
+<div class="card mb-3">
+  <div class="card-header">Period</div>
+  <div class="card-body">
+  {{ duration(form, "Validity", "Validity") }}
   </div>
 </div>
-<div class="elements sm">
-  <div class="title">Constraints / Usage</div>
+<div class="card mb-3">
+  <div class="card-header">Constraints / Usage</div>
+  <div class="card-body">
   {{ checkbox(form, "CanSign", "Can sign certificates (Certificate Authority)") }}
   {{ checkbox(form, "CodeSigning", "Code signing")}}
   {{ checkbox(form, "ClientAuth", "Client auth")}}
   {{ checkbox(form, "ServerAuth", "Server auth")}}
+  </div>
 </div>
-<div class="elements sm">
-  <div class="title">Extensions</div>
-  <div class="double">
+<div class="card mb-3">
+  <div class="card-header">Extensions</div>
+  <div class="card-body">
     {{ domains(form, "SANs", "SANs (Subject Alternative Names)") }}
   </div>
 </div>

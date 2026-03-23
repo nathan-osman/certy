@@ -3,17 +3,15 @@
 {% block title %}Error{% endblock %}
 
 {% block header %}
-<div class="title">Something went wrong!</div>
-<div class="desc">
+<h2>Something went wrong!</h2>
+<div>
   We encountered an error while trying to render this page
 </div>
 {% endblock %}
 
 {% block content %}
-<div>
-  More information about the error is shown below:
-</div>
-<div class="error">
+<p>More information about the error is shown below:</p>
+<div class="alert alert-danger">
   <strong>Message:</strong>
   {{ msg }}
 </div>

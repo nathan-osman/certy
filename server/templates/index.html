@@ -3,16 +3,16 @@
 {% block title %}Root Certificates{% endblock %}
 
 {% block header %}
-<div class="title">Root Certificates</div>
-<div class="desc">
+<h2>Root Certificates</h2>
+<div>
   View root certificates currently managed by Certy
 </div>
 {% endblock %}
 
 {% block content %}
-<div class="muted">
+<p class="text-muted">
   Root certificates form the basis of trust. When properly installed, these certificates and any others signed by them are implicitly trusted by a device.
-</div>
+</p>
 {% import 'templates/macros/table.html' ref_table %}
 {{ ref_table("", refs) }}
 {% endblock %}

@@ -1,11 +1,10 @@
 {% extends "templates/base.html" %}
 
 {% block content %}
-  <form method="post" class="form elements lg">
+  <form method="post">
     {% block fields %}{% endblock %}
-    <div class="line"></div>
-    <div class="buttons">
-      <button type="submit" class="button primary">Submit</button>
+    <div class="mb-3">
+      <button type="submit" class="btn btn-primary">Submit</button>
     </div>
   </form>
 {% endblock %}

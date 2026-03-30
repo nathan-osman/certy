@@ -1,21 +1,25 @@
 {# Display a text input #}
-{% macro input(form, name, label, placeholder="", autofocus=false) export %}
+{% macro input(form, name, label, placeholder="", autofocus=false, help="") export %}
   {% if autofocus %}
     {% set autofocus = "autofocus" %}
   {% else %}
     {% set autofocus = "" %}
   {% endif %}
-  <label>
-    {{ label }}:
+  <div class="mb-3">
+    <label for="{{ name }}" class="form-label">{{ label }}</label>
     <input
       type="text"
       name="{{ name }}"
+      id="{{ name }}"
       placeholder="{{ placeholder }}"
       value="{{ form[name] }}"
-      class="input"
+      class="form-control"
       {{ autofocus }}
-      />
-  </label>
+    />
+    {% if help %}
+    <div class="form-text">{{ help }}</div>
+    {% endif %}
+  </div>
 {% endmacro %}
 
 {# Display a text input for entering a duration #}
@@ -25,23 +29,20 @@
 
 {# Display a comma-separated list of domain names #}
 {% macro domains(form, name, label) export %}
-  <div>
-    {{ input(form, name, label, "e.g. a.com, www.a.com, etc.") }}
-    <div class="muted small">
-      Most HTTP clients require all valid domain names to be listed here
-    </div>
-  </div>
+  {{ input(form, name, label, "e.g. a.com, www.a.com, etc.", false, "Most HTTP clients require all valid domain names to be listed here") }}
 {% endmacro %}
 
 {# Display a checkbox #}
 {% macro checkbox(form, name, label) export %}
-  <label class="checkbox">
+  <div class="form-check">
     <input
       type="checkbox"
       name="{{ name }}"
+      id="{{ name }}"
       value="true"
+      class="form-check-input"
       {% if form[name] %}checked{% endif %}
       />
-    {{ label }}
-  </label>
+    <label class="form-check-label" for="{{ name }}">{{ label }}</label>
+  </div>
 {% endmacro %}

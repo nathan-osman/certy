@@ -1,34 +1,33 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-bs-theme="dark">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
   <title>{% block title %}{% endblock %} - Certy</title>
-
   <link rel="shortcut icon" href="/static/img/favicon.png">
-  <link rel="stylesheet" href="/static/css/certy.css">
+  <link rel="stylesheet" href="/static/css/bootstrap.min.css">
+  <link rel="stylesheet" href="/static/icons/bootstrap-icons.min.css">
 </head>
 <body>
-  <div class="navbar">
+  <nav class="navbar navbar-expand-lg text-bg-primary">
     <div class="container">
-      <div class="logo">
-        <a href="/">Certy</a>
-      </div>
+      <a class="navbar-brand" href="/">
+        <img src="/static/img/favicon.png" alt="Logo" width="30" height="24">
+        Certy
+      </a>
     </div>
-  </div>
-  <div class="header">
+  </nav>
+  <div class="text-bg-secondary bg-secondary-subtle p-3">
     <div class="container">
     {% block header %}{% endblock %}
     </div>
   </div>
-  <div class="container">
-    <div class="content elements lg">
-      {% if cert %}
-        {% include "templates/fragments/breadcrumbs.html" %}
-      {% endif %}
-      {% block content %}{% endblock %}
-    </div>
+  <div class="container p-3">
+    {% if cert %}
+    {% include "templates/fragments/breadcrumbs.html" %}
+    {% endif %}
+    {% block content %}{% endblock %}
   </div>
+  <script src="/static/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

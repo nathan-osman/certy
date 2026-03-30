@@ -3,35 +3,33 @@
   {% if path %}
     {% set path = prefix + "/" %}
   {% endif %}
-  <div class="elements">
-    <table class="table">
-      <thead>
+  <table class="table mt-3">
+    <thead>
+      <tr>
+        <th>Common Name</th>
+        <th>Issued</th>
+        <th>Expires</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for r in refs %}
         <tr>
-          <th>Common Name</th>
-          <th>Issued</th>
-          <th>Expires</th>
+          <th>
+            <a href="/view?cert={{ path }}{{ r.ID }}">
+              {{ r.X509.Subject.CommonName}}
+            </a>
+          </th>
+          <td>{{ r.X509.NotBefore | formatDate }}</td>
+          <td>{{ r.X509.NotAfter | formatDate }}</td>
         </tr>
-      </thead>
-      <tbody>
-        {% for r in refs %}
-          <tr>
-            <th>
-              <a href="/view?cert={{ path }}{{ r.ID }}">
-                {{ r.X509.Subject.CommonName}}
-              </a>
-            </th>
-            <td>{{ r.X509.NotBefore | formatDate }}</td>
-            <td>{{ r.X509.NotAfter | formatDate }}</td>
-          </tr>
-        {% empty %}
-          <tr>
-            <td colspan="3" class="empty muted">No certificates!</td>
-          </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-    <div class="buttons">
-      <a href="/new?cert={{ prefix }}" class="button primary">Create New</a>
-    </div>
-  </div>
+      {% empty %}
+        <tr>
+          <td colspan="3" class="text-muted">No certificates, click "Create New" below to create a certificate.</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  <p>
+    <a href="/new?cert={{ prefix }}" class="btn btn-primary">Create New</a>
+  </p>
 {% endmacro %}

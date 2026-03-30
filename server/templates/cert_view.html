@@ -3,125 +3,125 @@
 {% block title %}{{ cert.X509.Subject.CommonName }}{% endblock %}
 
 {% block header %}
-<div class="title">{{ cert.X509.Subject.CommonName }}</div>
-<div class="desc">
+<h2>{{ cert.X509.Subject.CommonName }}</h2>
+<div>
   View and manage this certificate and its children
 </div>
 {% endblock %}
 
 {% block content %}
 {% import 'templates/macros/action.html' action %}
+
 {% macro certname(name) %}
   {{ name.CommonName }}
   {% if name.Organization %}
     &mdash;
-    <span class="muted">{{ name.Organization[0] }}</span>
+    <span class="text-muted">{{ name.Organization[0] }}</span>
   {% endif %}
   {% if name.Country or name.Province or name.Locality %}
-    <div class="muted">{{ combineAddress(name) }}</div>
+    <div class="text-muted">{{ combineAddress(name) }}</div>
   {% endif %}
 {% endmacro %}
-<div class="elements">
-  <div class="title">
+
+<div class="card mb-3">
+  <div class="card-header">
     Certificate Information
-    <div class="desc">
-      The table below lists the properties of the X.509 certificate below.
-    </div>
   </div>
-  <table class="table">
-    <tbody>
-      <tr>
-        <th>SHA-256 fingerprint:</th>
-        <td title="{{ cert.Fingerprint }}">
-          {{ cert.Fingerprint|truncatechars:20 }}&mldr;
-        </td>
-      </tr>
-      <tr>
-        <th>Serial</th>
-        <td>{{ cert.X509.SerialNumber }}</td>
-      </tr>
-      <tr>
-        <th>Common name:</th>
-        <td>{{ certname(cert.X509.Subject) }}</td>
-      </tr>
-      <tr>
-        <th>Issued by:</th>
-        <td>{{ certname(cert.X509.Issuer) }}</td>
-      </tr>
-      <tr>
-        <th>Valid from:</th>
-        <td>{{ cert.X509.NotBefore | formatDate }}</td>
-      </tr>
-      <tr>
-        <th>Valid to:</th>
-        <td>
-          {{ cert.X509.NotAfter | formatDate }}
-          <span class="muted">
-            (duration: {{ cert.X509.NotAfter.Sub(cert.X509.NotBefore) | formatDuration }})
-          </span>
-        </td>
-      </tr>
-      <tr>
-        <th>Certificate authority:</th>
-        <td>
-          {% if cert.X509.IsCA %}yes{% else %}no{% endif %}
-        </td>
-      </tr>
-      <tr>
-        <th>Key usage:</th>
-        <td>
-          {% for u in cert.KeyUsage() %}
-            <div>{{ u }}</div>
-          {% endfor %}
-        </td>
-      </tr>
-      {% if cert.X509.DNSNames %}
+  <div class="card-body">
+    <p class="card-text">
+      The table below lists the properties of the X.509 certificate below.
+    </p>
+    <table class="table">
+      <tbody>
         <tr>
-          <th>SANs:</th>
+          <th>SHA-256 fingerprint:</th>
+          <td title="{{ cert.Fingerprint }}">
+            {{ cert.Fingerprint|truncatechars:20 }}&mldr;
+          </td>
+        </tr>
+        <tr>
+          <th>Serial</th>
+          <td>{{ cert.X509.SerialNumber }}</td>
+        </tr>
+        <tr>
+          <th>Common name:</th>
+          <td>{{ certname(cert.X509.Subject) }}</td>
+        </tr>
+        <tr>
+          <th>Issued by:</th>
+          <td>{{ certname(cert.X509.Issuer) }}</td>
+        </tr>
+        <tr>
+          <th>Valid from:</th>
+          <td>{{ cert.X509.NotBefore | formatDate }}</td>
+        </tr>
+        <tr>
+          <th>Valid to:</th>
           <td>
-            {% for n in cert.X509.DNSNames %}
-              <div>{{ n }}</div>
+            {{ cert.X509.NotAfter | formatDate }}
+            <span class="muted">
+              (duration: {{ cert.X509.NotAfter.Sub(cert.X509.NotBefore) | formatDuration }})
+            </span>
+          </td>
+        </tr>
+        <tr>
+          <th>Certificate authority:</th>
+          <td>
+            {% if cert.X509.IsCA %}yes{% else %}no{% endif %}
+          </td>
+        </tr>
+        <tr>
+          <th>Key usage:</th>
+          <td>
+            {% for u in cert.KeyUsage() %}
+              <div>{{ u }}</div>
             {% endfor %}
           </td>
         </tr>
-      {% endif %}
-    </tbody>
-  </table>
-  <form method="post" action="/validate?cert={{ path }}" class="buttons">
-    <button type="submit" class="button primary">
-      Validate
-    </button>
-  </form>
-</div>
-<div class="elements">
-  <div class="title">
-    Export
-    <div class="desc">
-      Choose a format below to export the certificate and / or private key.
-    </div>
+        {% if cert.X509.DNSNames %}
+          <tr>
+            <th>SANs:</th>
+            <td>
+              {% for n in cert.X509.DNSNames %}
+                <div>{{ n }}</div>
+              {% endfor %}
+            </td>
+          </tr>
+        {% endif %}
+      </tbody>
+    </table>
+    <form method="post" action="/validate?cert={{ path }}" class="buttons">
+      <button type="submit" class="btn btn-primary">
+        Validate
+      </button>
+    </form>
   </div>
-  <div class="buttons">
-    {{ action(path, "export_cert_pem", "Cert (PEM)") }}
-    <a href="/pkcs12?cert={{ path }}" class="button primary">
-      PKCS#12
-    </a>
-    {% if cert.Parents %}
-      {{ action(path, "export_chain_pem", "Chain") }}
-    {% endif %}
-    {{ action(path, "export_pub_key", "Pubkey") }}
-    {{ action(path, "export_priv_key", "Priv. Key") }}
+</div>
+<div class="card mb-3">
+  <div class="card-header">Export</div>
+  <div class="card-body">
+    <p class="card-text">Choose a format below to export the certificate and / or private key.</p>
+    <div class="hstack gap-3">
+      {{ action(path, "export_cert_pem", "Cert (PEM)") }}
+      <a href="/pkcs12?cert={{ path }}" class="btn btn-primary">
+        PKCS#12
+      </a>
+      {% if cert.Parents %}
+        {{ action(path, "export_chain_pem", "Chain") }}
+      {% endif %}
+      {{ action(path, "export_pub_key", "Pubkey") }}
+      {{ action(path, "export_priv_key", "Priv. Key") }}
+    </div>
   </div>
 </div>
 {% if cert.CanSign() %}
-  <div class="elements">
-    <div class="title">
-      Child Certificates
-      <div class="desc">
-        Certificates signed by this one are displayed below.
-      </div>
-    </div>
+<div class="card">
+  <div class="card-header">Child Certificates</div>
+  <div class="card-body">
+    <p class="card-text">Certificates signed by this one are displayed below.</p>
     {% import 'templates/macros/table.html' ref_table %}
     {{ ref_table(path, cert.Children) }}
   </div>
+</div>
 {% endif %}
 {% endblock %}

@@ -1,0 +1,22 @@
+{% extends "templates/base.html" %}
+
+{% block title %}Validation Results{% endblock %}
+
+{% block header %}
+<div class="title">Validation Results</div>
+<div class="desc">
+  The results of your certificate validation are shown below
+</div>
+{% endblock %}
+
+{% block content %}
+<div>
+  {% if msg %}
+    <div class="error">
+      <strong>Error:</strong> {{ msg }}
+    </div>
+  {% else %}
+    Validation was successful!
+  {% endif %}
+</div>
+{% endblock %}

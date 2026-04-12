@@ -165,7 +165,8 @@ func (s *Storage) ExportCertificateChainPEM(certPath string) ([]byte, error) {
 // ExportCertificatePKCS12Params provides ExportCertificatePKCS12 with
 // parameters for exporting a certificate and its private key.
 type ExportCertificatePKCS12Params struct {
-	Password string
+	Password  string
+	UseLegacy bool
 }
 
 // ExportCertificatePKCS12 exports the specified certificate and its private
@@ -192,7 +193,13 @@ func (s *Storage) ExportCertificatePKCS12(
 		certs = append([]*x509.Certificate{v.cert}, certs...)
 		v = v.parent
 	}
-	return pkcs12.Modern.Encode(k, c.cert, certs, params.Password)
+	var encoder *pkcs12.Encoder
+	if params.UseLegacy {
+		encoder = pkcs12.LegacyDES
+	} else {
+		encoder = pkcs12.Modern
+	}
+	return encoder.Encode(k, c.cert, certs, params.Password)
 }
 
 // ExportPublicKeyPEM exports the public key of the specified certificate as a

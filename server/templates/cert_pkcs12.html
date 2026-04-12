@@ -17,6 +17,7 @@
 {% endblock %}
 
 {% block fields %}
-{% import 'templates/macros/form.html' input %}
+{% import 'templates/macros/form.html' checkbox, input %}
 {{ input(form, "Password", "Password", "e.g. SuperSecret123!", true) }}
+{{ checkbox(form, "UseLegacy", "Use legacy hash and cipher for older devices")}}
 {% endblock %}

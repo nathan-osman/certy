@@ -3,8 +3,8 @@
 {% block title %}Validation Results{% endblock %}
 
 {% block header %}
-<div class="title">Validation Results</div>
-<div class="desc">
+<h2>Validation Results</h2>
+<div>
   The results of your certificate validation are shown below
 </div>
 {% endblock %}
@@ -12,11 +12,12 @@
 {% block content %}
 <div>
   {% if msg %}
-    <div class="error">
-      <strong>Error:</strong> {{ msg }}
-    </div>
+  <div class="alert alert-danger">
+    {{ msg }}
   {% else %}
-    Validation was successful!
+  <div class="alert alert-success">
+    This certificate is valid!
   {% endif %}
+  </div>
 </div>
 {% endblock %}

@@ -376,7 +376,7 @@ func (s *Storage) CreateCertificate(
 	}
 	if params.ServerAuth {
 		cert.KeyUsage |=
-			x509.KeyUsageDigitalSignature &
+			x509.KeyUsageDigitalSignature |
 				x509.KeyUsageKeyEncipherment
 		cert.ExtKeyUsage = append(
 			cert.ExtKeyUsage,

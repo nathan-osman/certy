@@ -9,6 +9,9 @@
   <link rel="shortcut icon" href="/static/img/favicon.png">
   <link rel="stylesheet" href="/static/css/bootstrap.min.css">
   <link rel="stylesheet" href="/static/icons/bootstrap-icons.min.css">
+
+  <!-- This needs to run before the DOM renders -->
+  <script src="/static/js/theme.js"></script>
 </head>
 <body>
   {% include "fragments/header.html" %}
@@ -19,6 +22,8 @@
     {% endif %}
     {% block content %}{% endblock %}
   </div>
+
+  <!-- Not required for core functionality, but adds a few nice helpers  -->
   <script src="/static/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

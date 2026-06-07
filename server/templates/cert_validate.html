@@ -1,14 +1,26 @@
 {% extends "base.html" %}
 
 {% block content %}
+<h4>Verdict</h4>
 <div>
   {% if msg %}
-  <div class="alert alert-danger">
-    {{ msg }}
+    <div class="text-danger">
+      <i class="bi bi-x"></i>
+      <strong>{{ msg }}</strong>
+    </div>
   {% else %}
-  <div class="alert alert-success">
-    This certificate is valid!
+    <div class="text-success">
+      <i class="bi bi-check"></i>
+      <strong>This certificate is valid!</strong>
+      <ul>
+        {% if cert.Parents %}
+          <li>Chain of trust to root certificate</li>
+        {% else %}
+          <li>Is a trusted root certificate</li>
+        {% endif %}
+        <li>Is not currently expired</li>
+      </ul>
+    </div>
   {% endif %}
-  </div>
 </div>
 {% endblock %}

@@ -32,6 +32,21 @@ type storageCert struct {
 	children    map[string]*storageCert
 }
 
+func (s *storageCert) chain() []*storageCert {
+	var (
+		certs = []*storageCert{}
+		cert  = s
+	)
+	for {
+		if cert.parent == nil {
+			break
+		}
+		cert = cert.parent
+		certs = append(certs, cert)
+	}
+	return certs
+}
+
 func (s *Storage) loadCerts(
 	dir string,
 	parent *storageCert,

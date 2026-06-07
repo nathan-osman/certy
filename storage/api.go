@@ -118,8 +118,23 @@ func (s *Storage) ValidateCertificate(certPath string) error {
 	if err != nil {
 		return err
 	}
+	var (
+		certs = c.chain()
+		pRoot = x509.NewCertPool()
+		pImed = x509.NewCertPool()
+	)
+	if len(certs) > 0 {
+		pRoot.AddCert(certs[len(certs)-1].cert)
+		for _, v := range certs[:len(certs)-1] {
+			pImed.AddCert(v.cert)
+		}
+	} else {
+		pRoot.AddCert(c.cert)
+	}
 	if _, err := c.cert.Verify(x509.VerifyOptions{
-		KeyUsages: []x509.ExtKeyUsage{x509.ExtKeyUsageAny},
+		Roots:         pRoot,
+		Intermediates: pImed,
+		KeyUsages:     []x509.ExtKeyUsage{x509.ExtKeyUsageAny},
 	}); err != nil {
 		return err
 	}

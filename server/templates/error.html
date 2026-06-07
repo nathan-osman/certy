@@ -1,9 +1,13 @@
 {% extends "base.html" %}
 
 {% block content %}
-<p>More information about the error is shown below:</p>
-<div class="alert alert-danger">
-  <strong>Message:</strong>
-  {{ msg }}
+<p>
+  More detailed information about the error is shown below:
+</p>
+<div class="text-danger">
+  <p>
+    <strong>Error:</strong> {{ msg }}
+  </p>
+  <pre>{{ stack }}</pre>
 </div>
 {% endblock %}

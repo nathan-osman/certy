@@ -15,7 +15,7 @@ const (
 )
 
 var (
-	validityRegExp = regexp.MustCompile(`(\d+)(\w+)`)
+	validityRegExp = regexp.MustCompile(`^(\d+)(\w+)$`)
 
 	errInvalidDuration = errors.New("invalid duration specified")
 	errInvalidUnit     = errors.New("invalid unit specified")

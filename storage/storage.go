@@ -39,7 +39,7 @@ func New(cfg *Config) (*Storage, error) {
 		logger:  cfg.Logger,
 		certDir: filepath.Join(cfg.DataDir, "certs"),
 	}
-	if err := os.MkdirAll(s.certDir, 0600); err != nil {
+	if err := os.MkdirAll(s.certDir, 0700); err != nil {
 		return nil, err
 	}
 	if s.logger == nil {

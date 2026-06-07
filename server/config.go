@@ -12,9 +12,12 @@ type Config struct {
 	// Addr is the address the server should listen on.
 	Addr string
 
+	// Debug indicates that debug mode is enabled.
+	Debug bool
+
 	// Logger can be used to capture log messages.
 	Logger *slog.Logger
 
-	// Storage is a pointer to a Storage instance
+	// Storage is a pointer to a Storage instance.
 	Storage *storage.Storage
 }

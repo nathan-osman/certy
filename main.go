@@ -29,9 +29,14 @@ func main() {
 				EnvVars: []string{"DATA_DIR"},
 				Usage:   "path to data directory",
 			},
+			&cli.BoolFlag{
+				Name:    "debug",
+				EnvVars: []string{"DEBUG"},
+				Usage:   "enable debug mode",
+			},
 			&cli.StringFlag{
 				Name:    "server-addr",
-				Value:   ":80",
+				Value:   ":8000",
 				EnvVars: []string{"SERVER_ADDR"},
 				Usage:   "HTTP address to listen on",
 			},
@@ -50,6 +55,7 @@ func main() {
 			// Start the server
 			s, err := server.New(&server.Config{
 				Addr:    c.String("server-addr"),
+				Debug:   c.Bool("debug"),
 				Storage: st,
 			})
 			if err != nil {

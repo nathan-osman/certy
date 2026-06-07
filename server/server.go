@@ -45,6 +45,12 @@ type Server struct {
 
 // New create a new Server instance.
 func New(cfg *Config) (*Server, error) {
+
+	// Switch to release mode when debug mode is enabled
+	if !cfg.Debug {
+		gin.SetMode(gin.ReleaseMode)
+	}
+
 	var (
 		r = gin.New()
 		s = &Server{
@@ -63,14 +69,27 @@ func New(cfg *Config) (*Server, error) {
 	}
 	s.logger = s.logger.With("package", "server")
 
-	// Load the template set
-	subFS, err := fs.Sub(tmplFS, "templates")
-	if err != nil {
-		return nil, err
+	// If debug mode is enabled, use the templates directly from the
+	// filesystem; otherwise, use the built-in ones
+	var tmplLoader pongo2.TemplateLoader
+	if cfg.Debug {
+		tmplLoader = pongo2.MustNewLocalFileSystemLoader(
+			"server/templates",
+		)
+	} else {
+		subFS, err := fs.Sub(tmplFS, "templates")
+		if err != nil {
+			return nil, err
+		}
+		tmplLoader = &loader.Loader{Content: subFS}
 	}
-	tmplSet := pongo2.NewSet("", &loader.Loader{
-		Content: subFS,
-	})
+
+	tmplSet := pongo2.NewSet("", tmplLoader)
+
+	// Enable auto-reload if debug is enabled
+	if cfg.Debug {
+		tmplSet.Debug = true
+	}
 
 	// Render HTML templates with pongo
 	r.HTMLRender = pongo2gin.New(pongo2gin.RenderOptions{

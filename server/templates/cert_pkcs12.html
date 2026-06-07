@@ -1,14 +1,5 @@
 {% extends "form.html" %}
 
-{% block title %}Export PKCS#12{% endblock %}
-
-{% block header %}
-<h2>Export PKCS#12</h2>
-<div>
-  Export {{ cert.X509.Subject.CommonName }} and its private key in PKCS#12 format
-</div>
-{% endblock %}
-
 {% block content %}
 <p class="text-muted">
   PKCS#12 files include both the certificate and its private key. To enhance security, the file is encrypted with a passphrase that will be required on import.

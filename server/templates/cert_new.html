@@ -1,19 +1,5 @@
 {% extends "form.html" %}
 
-{% block title %}New Certificate{% endblock %}
-
-{% block header %}
-<h2>New Certificate</h2>
-<div>
-  Create a new
-  {% if cert %}
-    certificate signed by {{ cert.X509.Subject.CommonName }}
-  {% else %}
-    root certificate
-  {% endif %}
-</div>
-{% endblock %}
-
 {% block fields %}
 {% import 'macros/form.html' checkbox, domains, duration, input %}
 {% if cert %}

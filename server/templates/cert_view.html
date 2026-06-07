@@ -1,14 +1,5 @@
 {% extends "base.html" %}
 
-{% block title %}{{ cert.X509.Subject.CommonName }}{% endblock %}
-
-{% block header %}
-<h2>{{ cert.X509.Subject.CommonName }}</h2>
-<div>
-  View and manage this certificate and its children
-</div>
-{% endblock %}
-
 {% block content %}
 {% import 'macros/action.html' action %}
 

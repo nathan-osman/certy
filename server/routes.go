@@ -21,14 +21,18 @@ func (s *Server) errorHandler(c *gin.Context, err any) {
 		msg = v.Error()
 	}
 	c.HTML(http.StatusInternalServerError, "error.html", pongo2.Context{
-		"msg": msg,
+		"title": "Something Went Wrong",
+		"desc":  "An error was encountered while trying to display the page",
+		"msg":   msg,
 	})
 	c.Abort()
 }
 
 func (s *Server) index(c *gin.Context) {
 	c.HTML(http.StatusOK, "index.html", pongo2.Context{
-		"refs": s.storage.GetRootCertificates(),
+		"title": "Root Certificates",
+		"desc":  "View root certificates currently managed by Certy",
+		"refs":  s.storage.GetRootCertificates(),
 	})
 }
 
@@ -39,6 +43,8 @@ func (s *Server) certView(c *gin.Context) {
 		panic(err)
 	}
 	c.HTML(http.StatusOK, "cert_view.html", pongo2.Context{
+		"title":          v.X509.Subject.CommonName,
+		"desc":           "View and manage this certificate and its children",
 		"path":           p,
 		"cert":           v,
 		"combineAddress": combineAddress,
@@ -85,11 +91,22 @@ func (s *Server) certNew(c *gin.Context) {
 			form.CanSign = true
 		}
 	}
+	var desc string
+	if cert != nil {
+		desc = fmt.Sprintf(
+			"Create a new certificate signed by %s",
+			cert.X509.Subject.CommonName,
+		)
+	} else {
+		desc = "Create a new root certificate"
+	}
 	c.HTML(http.StatusOK, "cert_new.html", pongo2.Context{
-		"cert": cert,
-		"form": form,
-		"path": p,
-		"page": "New",
+		"title": "New Certificate",
+		"desc":  desc,
+		"cert":  cert,
+		"form":  form,
+		"path":  p,
+		"page":  "New",
 	})
 }
 
@@ -106,10 +123,12 @@ func (s *Server) certValidate(c *gin.Context) {
 		msg = err.Error()
 	}
 	c.HTML(http.StatusOK, "cert_validate.html", pongo2.Context{
-		"cert": v,
-		"path": p,
-		"msg":  msg,
-		"page": "Validation",
+		"title": "Validation Results",
+		"desc":  "The results of your certificate validation are shown below",
+		"cert":  v,
+		"path":  p,
+		"msg":   msg,
+		"page":  "Validation",
 	})
 }
 
@@ -167,10 +186,16 @@ func (s *Server) certPKCS12(c *gin.Context) {
 		downloadCert(c, "application/x-pkcs12", b, v, "", "p12")
 		return
 	}
+	desc := fmt.Sprintf(
+		"Export %s and its private key in PKCS#12 format",
+		v.X509.Subject.CommonName,
+	)
 	c.HTML(http.StatusOK, "cert_pkcs12.html", pongo2.Context{
-		"cert": v,
-		"form": form,
-		"path": p,
-		"page": "Export",
+		"title": "Export PKCS#12",
+		"desc":  desc,
+		"cert":  v,
+		"form":  form,
+		"path":  p,
+		"page":  "Export",
 	})
 }

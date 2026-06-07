@@ -3,7 +3,9 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>{% block title %}{% endblock %} - Certy</title>
+
+  <title>{{ title }} - Certy</title>
+
   <link rel="shortcut icon" href="/static/img/favicon.png">
   <link rel="stylesheet" href="/static/css/bootstrap.min.css">
   <link rel="stylesheet" href="/static/icons/bootstrap-icons.min.css">
@@ -17,11 +19,7 @@
       </a>
     </div>
   </nav>
-  <div class="text-bg-secondary bg-secondary-subtle p-3">
-    <div class="container">
-    {% block header %}{% endblock %}
-    </div>
-  </div>
+  {% include "fragments/title.html" %}
   <div class="container p-3">
     {% if cert %}
     {% include "fragments/breadcrumbs.html" %}

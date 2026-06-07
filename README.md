@@ -6,6 +6,8 @@ Certy provides an easy way to manage X.509 certificates and their private keys t
 - View certificate attributes
 - Create intermediate certificates signed by the root CAs
 - Export certificates and keys in PEM and PKCS#12 formats
+- Validate certificates and certificate chains
+- Do all of this with a choice of light or dark theme!
 
 ### Screenshots
 
@@ -41,7 +43,7 @@ In addition to running as a standalone service, Certy can run in a Docker contai
     docker run \
         -d \
         --name certy \
-        -p 8000:80 \
+        -p 8000:8000 \
         "$(pwd)/data:/data" \
         nathanosman/certy
 

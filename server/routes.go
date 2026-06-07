@@ -20,14 +20,14 @@ func (s *Server) errorHandler(c *gin.Context, err any) {
 	case error:
 		msg = v.Error()
 	}
-	c.HTML(http.StatusInternalServerError, "templates/error.html", pongo2.Context{
+	c.HTML(http.StatusInternalServerError, "error.html", pongo2.Context{
 		"msg": msg,
 	})
 	c.Abort()
 }
 
 func (s *Server) index(c *gin.Context) {
-	c.HTML(http.StatusOK, "templates/index.html", pongo2.Context{
+	c.HTML(http.StatusOK, "index.html", pongo2.Context{
 		"refs": s.storage.GetRootCertificates(),
 	})
 }
@@ -38,7 +38,7 @@ func (s *Server) certView(c *gin.Context) {
 	if err != nil {
 		panic(err)
 	}
-	c.HTML(http.StatusOK, "templates/cert_view.html", pongo2.Context{
+	c.HTML(http.StatusOK, "cert_view.html", pongo2.Context{
 		"path":           p,
 		"cert":           v,
 		"combineAddress": combineAddress,
@@ -85,7 +85,7 @@ func (s *Server) certNew(c *gin.Context) {
 			form.CanSign = true
 		}
 	}
-	c.HTML(http.StatusOK, "templates/cert_new.html", pongo2.Context{
+	c.HTML(http.StatusOK, "cert_new.html", pongo2.Context{
 		"cert": cert,
 		"form": form,
 		"path": p,
@@ -105,7 +105,7 @@ func (s *Server) certValidate(c *gin.Context) {
 	); err != nil {
 		msg = err.Error()
 	}
-	c.HTML(http.StatusOK, "templates/cert_validate.html", pongo2.Context{
+	c.HTML(http.StatusOK, "cert_validate.html", pongo2.Context{
 		"cert": v,
 		"path": p,
 		"msg":  msg,
@@ -167,7 +167,7 @@ func (s *Server) certPKCS12(c *gin.Context) {
 		downloadCert(c, "application/x-pkcs12", b, v, "", "p12")
 		return
 	}
-	c.HTML(http.StatusOK, "templates/cert_pkcs12.html", pongo2.Context{
+	c.HTML(http.StatusOK, "cert_pkcs12.html", pongo2.Context{
 		"cert": v,
 		"form": form,
 		"path": p,

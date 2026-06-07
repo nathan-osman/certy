@@ -1,4 +1,4 @@
-{% extends "templates/base.html" %}
+{% extends "base.html" %}
 
 {% block title %}Root Certificates{% endblock %}
 
@@ -13,6 +13,6 @@
 <p class="text-muted">
   Root certificates form the basis of trust. When properly installed, these certificates and any others signed by them are implicitly trusted by a device.
 </p>
-{% import 'templates/macros/table.html' ref_table %}
+{% import 'macros/table.html' ref_table %}
 {{ ref_table("", refs) }}
 {% endblock %}

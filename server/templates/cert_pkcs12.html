@@ -1,4 +1,4 @@
-{% extends "templates/form.html" %}
+{% extends "form.html" %}
 
 {% block title %}Export PKCS#12{% endblock %}
 
@@ -17,7 +17,7 @@
 {% endblock %}
 
 {% block fields %}
-{% import 'templates/macros/form.html' checkbox, input %}
+{% import 'macros/form.html' checkbox, input %}
 {{ input(form, "Password", "Password", "e.g. SuperSecret123!", true) }}
 {{ checkbox(form, "UseLegacy", "Use legacy hash and cipher for older devices")}}
 {% endblock %}

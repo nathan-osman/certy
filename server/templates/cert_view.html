@@ -1,4 +1,4 @@
-{% extends "templates/base.html" %}
+{% extends "base.html" %}
 
 {% block title %}{{ cert.X509.Subject.CommonName }}{% endblock %}
 
@@ -10,7 +10,7 @@
 {% endblock %}
 
 {% block content %}
-{% import 'templates/macros/action.html' action %}
+{% import 'macros/action.html' action %}
 
 {% macro certname(name) %}
   {{ name.CommonName }}
@@ -119,7 +119,7 @@
   <div class="card-header">Child Certificates</div>
   <div class="card-body">
     <p class="card-text">Certificates signed by this one are displayed below.</p>
-    {% import 'templates/macros/table.html' ref_table %}
+    {% import 'macros/table.html' ref_table %}
     {{ ref_table(path, cert.Children) }}
   </div>
 </div>

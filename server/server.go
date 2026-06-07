@@ -4,6 +4,7 @@ import (
 	"context"
 	"embed"
 	"errors"
+	"io/fs"
 	"log/slog"
 	"net/http"
 
@@ -63,8 +64,12 @@ func New(cfg *Config) (*Server, error) {
 	s.logger = s.logger.With("package", "server")
 
 	// Load the template set
+	subFS, err := fs.Sub(tmplFS, "templates")
+	if err != nil {
+		return nil, err
+	}
 	tmplSet := pongo2.NewSet("", &loader.Loader{
-		Content: tmplFS,
+		Content: subFS,
 	})
 
 	// Render HTML templates with pongo

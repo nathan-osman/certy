@@ -1,4 +1,4 @@
-{% extends "templates/form.html" %}
+{% extends "form.html" %}
 
 {% block title %}New Certificate{% endblock %}
 
@@ -15,7 +15,7 @@
 {% endblock %}
 
 {% block fields %}
-{% import 'templates/macros/form.html' checkbox, domains, duration, input %}
+{% import 'macros/form.html' checkbox, domains, duration, input %}
 {% if cert %}
   {% set placeholder = "e.g. Intermediate CA, www.example.com" %}
 {% else %}

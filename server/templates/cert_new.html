@@ -8,40 +8,53 @@
   {% set placeholder = "e.g. John Smith's Root CA" %}
 {% endif %}
 
-{{ input(form, "CommonName", "Common name", placeholder, true) }}
-
-<div class="card mb-3">
-  <div class="card-header">Information</div>
-  <div class="card-body">
-    <p class="bg-body-tertiary border border-secondary-subtle rounded p-3">The information in this section is optional, though recommended.</p>
-    {{ input(form, "Organization", "Organization", "e.g. Your Name or MyCompany Ltd.") }}
-    {{ input(form, "OrganizationalUnit", "Organizational unit", "e.g. Research Division") }}
-    {{ input(form, "Country", "Country code", "e.g. US, CA, etc.") }}
-    {{ input(form, "Province", "Province or State", "e.g. Alberta, Alaska, etc.") }}
-    {{ input(form, "Locality", "City", "e.g. Atlanta, Toronto, etc.") }}
-    {{ input(form, "StreetAddress", "Street address", "e.g. 1234 Park Way") }}
-    {{ input(form, "PostalCode", "Postal or zip code", "e.g. 12345") }}
+<div class="row g-4">
+  <div class="col-md-8">
+    <div class="card mb-3">
+      <div class="card-header">Information</div>
+      <div class="card-body">
+        {{ input(form, "CommonName", "Common name", placeholder, true, true) }}
+        {{ input(form, "Organization", "Organization", "e.g. Your Name or MyCompany Ltd.") }}
+        {{ input(form, "OrganizationalUnit", "Organizational unit", "e.g. Research Division") }}
+        <div class="row">
+          <div class="col-md-4">
+            {{ input(form, "Country", "Country code", "e.g. US, CA, etc.") }}
+          </div>
+          <div class="col-md-4">
+            {{ input(form, "Province", "Province or State", "e.g. Alberta, Alaska, etc.") }}
+          </div>
+          <div class="col-md-4">
+            {{ input(form, "Locality", "City", "e.g. Atlanta, Toronto, etc.") }}
+          </div>
+          <div class="col-md-8">
+            {{ input(form, "StreetAddress", "Street address", "e.g. 1234 Park Way") }}
+          </div>
+          <div class="col-md-4">
+            {{ input(form, "PostalCode", "Postal or zip code", "e.g. 12345") }}
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
-</div>
-<div class="card mb-3">
-  <div class="card-header">Period</div>
-  <div class="card-body">
-  {{ duration(form, "Validity", "Validity") }}
-  </div>
-</div>
-<div class="card mb-3">
-  <div class="card-header">Constraints / Usage</div>
-  <div class="card-body">
-  {{ checkbox(form, "CanSign", "Can sign certificates (Certificate Authority)") }}
-  {{ checkbox(form, "CodeSigning", "Code signing")}}
-  {{ checkbox(form, "ClientAuth", "Client auth")}}
-  {{ checkbox(form, "ServerAuth", "Server auth")}}
-  </div>
-</div>
-<div class="card mb-3">
-  <div class="card-header">Extensions</div>
-  <div class="card-body">
-    {{ domains(form, "SANs", "SANs (Subject Alternative Names)") }}
+  <div class="col-md-4">
+    <div class="d-grid g-4">
+      <div class="card mb-3">
+        <div class="card-header">Validity & Usage</div>
+        <div class="card-body">
+          {{ duration(form, "Validity", "Validity", true) }}
+          {{ checkbox(form, "CanSign", "Can sign certificates (Certificate Authority)") }}
+          {{ checkbox(form, "CodeSigning", "Code signing")}}
+          {{ checkbox(form, "ClientAuth", "Client auth")}}
+          {{ checkbox(form, "ServerAuth", "Server auth")}}
+        </div>
+      </div>
+      <div class="card mb-3">
+        <div class="card-header">Extensions</div>
+        <div class="card-body">
+          {{ domains(form, "SANs", "SANs (Subject Alternative Names)") }}
+        </div>
+      </div>
+    </div>
   </div>
 </div>
 {% endblock %}

@@ -1,12 +1,17 @@
 {# Display a text input #}
-{% macro input(form, name, label, placeholder="", autofocus=false, help="") export %}
+{% macro input(form, name, label, placeholder="", required=false, autofocus=false, help="") export %}
   {% if autofocus %}
     {% set autofocus = "autofocus" %}
   {% else %}
     {% set autofocus = "" %}
   {% endif %}
   <div class="mb-3">
-    <label for="{{ name }}" class="form-label">{{ label }}</label>
+    <label for="{{ name }}" class="form-label">
+      {{ label }}
+      {% if required %}
+        <span class="badge text-bg-secondary small">required</span>
+      {% endif %}
+    </label>
     <input
       type="text"
       name="{{ name }}"
@@ -17,19 +22,19 @@
       {{ autofocus }}
     />
     {% if help %}
-    <div class="form-text">{{ help }}</div>
+      <div class="form-text">{{ help }}</div>
     {% endif %}
   </div>
 {% endmacro %}
 
 {# Display a text input for entering a duration #}
-{% macro duration(form, name, label) export %}
-  {{ input(form, name, label, "e.g. 3y, 4w, 90d, etc.") }}
+{% macro duration(form, name, label, required=false) export %}
+  {{ input(form, name, label, "e.g. 3y, 4w, 90d, etc.", required) }}
 {% endmacro %}
 
 {# Display a comma-separated list of domain names #}
 {% macro domains(form, name, label) export %}
-  {{ input(form, name, label, "e.g. a.com, www.a.com, etc.", false, "Most HTTP clients require all valid domain names to be listed here") }}
+  {{ input(form, name, label, "e.g. a.com, www.a.com, etc.", false, false, "Most HTTP clients require all valid domain names to be listed here") }}
 {% endmacro %}
 
 {# Display a checkbox #}

@@ -8,10 +8,18 @@
       {% else %}
         {% set p = c.ID %}
       {% endif %}
-      <li class="breadcrumb-item"><a href="/view?cert={{ p }}">{{ c.X509.Subject.CommonName }}</a></li>
+      <li class="breadcrumb-item">
+        <a href="/view?cert={{ p }}">
+          {{ c.X509.Subject.CommonName }}
+        </a>
+      </li>
     {% endfor %}
     {% if page %}
-      <li class="breadcrumb-item"><a href="/view?cert={{ path }}">{{ cert.X509.Subject.CommonName }}</a></li>
+      <li class="breadcrumb-item">
+        <a href="/view?cert={{ path }}">
+          {{ cert.X509.Subject.CommonName }}
+        </a>
+      </li>
       <li class="breadcrumb-item active">{{ page }}</li>
     {% else %}
       <li class="breadcrumb-item active">{{ cert.X509.Subject.CommonName }}</li>

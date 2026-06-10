@@ -13,7 +13,7 @@
   {% endif %}
 {% endmacro %}
 
-{% macro action(cert, name, label, full=false) %}
+{% macro action(cert, name, label) %}
   <form method="post" action="/action?cert={{ cert }}&action={{ name }}">
     <button type="submit" class="btn btn-primary w-100">
       {{ label }}

@@ -458,3 +458,34 @@ func (s *Storage) CreateCertificate(
 	}
 	return fmt.Sprintf("%s/%s", certPath, c.id), nil
 }
+
+// DeleteCertificate removes a certificate and its private key from disk. Note
+// that this will also delete all stored certificates and private keys signed
+// by it. This will not revoke the certificate.
+func (s *Storage) DeleteCertificate(
+	certPath string,
+) error {
+	s.mutex.Lock()
+	defer s.mutex.Unlock()
+
+	// Find the certificate and its directory on disk
+	c, d, err := s.getCert(certPath)
+	if err != nil {
+		return err
+	}
+
+	// Remove it from disk
+	if err := os.RemoveAll(d); err != nil {
+		return err
+	}
+
+	// Remove it from the internal map
+	if c.parent != nil {
+		delete(c.parent.children, c.id)
+	} else {
+		delete(s.rootCerts, c.id)
+	}
+
+	// Successfully deleted
+	return nil
+}

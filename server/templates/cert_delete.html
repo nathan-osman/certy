@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="text-danger">
+  <div class="alert alert-danger" role="alert">
+    <strong>Please read the message below carefully!</strong>
+  </div>
+  <h4>Warning!</h4>
+  <p class="text-danger">
+    You are about to delete:
+  </p>
+  <ul>
+    <li>
+      the certificate <strong>{{ cert.X509.Subject.CommonName }}</strong>
+    </li>
+    <li>its private key</li>
+    <li>
+      <strong><u>all certificates and keys signed by it</u></strong>
+    </li>
+  </ul>
+  <p>
+    Note that this is not the same as revoking the certificate and will not affect its validity.
+  </p>
+  <p class="fw-bold">This cannot be undone.</p>
+  <p>Are you sure you wish to proceed?</p>
+  <form method="post">
+    <button class="btn btn-danger">Proceed</button>
+  </form>
+</div>
+{% endblock %}

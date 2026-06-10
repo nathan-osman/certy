@@ -234,3 +234,35 @@ func (s *Server) certPKCS12(c *gin.Context) {
 		"page":  "Export",
 	})
 }
+
+func (s *Server) certDelete(c *gin.Context) {
+	p := c.Query("cert")
+	v, err := s.storage.GetCertificate(p)
+	if err != nil {
+		panic(err)
+	}
+	if c.Request.Method == http.MethodPost {
+		if err := s.storage.DeleteCertificate(p); err != nil {
+			panic(err)
+		}
+		if len(v.Parents) != 0 {
+			c.Redirect(
+				http.StatusSeeOther,
+				fmt.Sprintf(
+					"/view?cert=%s",
+					v.Parents[len(v.Parents)-1].ID,
+				),
+			)
+		} else {
+			c.Redirect(http.StatusSeeOther, "/")
+		}
+		return
+	}
+	c.HTML(http.StatusOK, "cert_delete.html", pongo2.Context{
+		"title": fmt.Sprintf("Delete %s", v.X509.Subject.CommonName),
+		"desc":  "Delete certificate and private key",
+		"cert":  v,
+		"path":  p,
+		"page":  "Delete",
+	})
+}

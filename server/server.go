@@ -106,6 +106,7 @@ func New(cfg *Config) (*Server, error) {
 	r.POST("/action", s.certAction)
 	r.Match(formMethods, "/new", s.certNew)
 	r.Match(formMethods, "/pkcs12", s.certPKCS12)
+	r.Match(formMethods, "/delete", s.certDelete)
 
 	// Static files
 	f, err := static.EmbedFolder(staticFS, "static")

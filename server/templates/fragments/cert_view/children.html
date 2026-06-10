@@ -1,0 +1,8 @@
+<div class="card">
+  <div class="card-header">Child Certificates</div>
+  <div class="card-body">
+    <p class="card-text">Certificates signed by this one are displayed below.</p>
+    {% import 'macros/table.html' ref_table %}
+    {{ ref_table(path, cert.Children) }}
+  </div>
+</div>

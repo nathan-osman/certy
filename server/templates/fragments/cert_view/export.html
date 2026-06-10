@@ -1,0 +1,17 @@
+<div class="card">
+  <div class="card-header">Export</div>
+  <div class="card-body">
+    <p class="card-text">Use the buttons below to export the certificate and / or private key.</p>
+    <div class="d-grid gap-2">
+      {{ action(path, "export_cert_pem", "Cert (PEM)") }}
+      <a href="/pkcs12?cert={{ path }}" class="btn btn-primary">
+        PKCS#12
+      </a>
+      {% if cert.Parents %}
+        {{ action(path, "export_chain_pem", "Chain") }}
+      {% endif %}
+      {{ action(path, "export_pub_key", "Pubkey") }}
+      {{ action(path, "export_priv_key", "Priv. Key") }}
+    </div>
+  </div>
+</div>

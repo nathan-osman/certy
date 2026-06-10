@@ -5,22 +5,44 @@
       Certy
     </a>
     <div class="navbar-nav">
-      <div class="nav-item">
-        <div class="dropdown">
-          <button
-            class="btn btn-dark dropdown-toggle"
-            type="button"
-            data-bs-toggle="dropdown"
-          >
-            <i class="bi bi-sun"></i> &nbsp; / &nbsp;
-            <i class="bi bi-moon"></i>
-          </button>
-          <ul class="dropdown-menu dropdown-menu-end">
-            <li><a class="dropdown-item certy-toggle" data-certy-toggle="auto">Auto</a></li>
-            <li><a class="dropdown-item certy-toggle" data-certy-toggle="light">Light</a></li>
-            <li><a class="dropdown-item certy-toggle" data-certy-toggle="dark">Dark</a></li>
-          </ul>
-        </div>
+      <div class="nav-item dropdown">
+        <button
+          class="btn btn-dark dropdown-toggle"
+          type="button"
+          data-bs-toggle="dropdown"
+        >
+          <i class="bi bi-sun"></i> &nbsp; / &nbsp;
+          <i class="bi bi-moon"></i>
+        </button>
+        <ul class="dropdown-menu dropdown-menu-end">
+          <li>
+            <a
+              class="dropdown-item certy-toggle d-flex gap-2 align-items-center"
+              data-certy-toggle="auto"
+            >
+              <i class="bi bi-stars"></i>
+              Auto
+            </a>
+          </li>
+          <li>
+            <a
+              class="dropdown-item certy-toggle d-flex gap-2 align-items-center"
+              data-certy-toggle="light"
+            >
+              <i class="bi bi-sun"></i>
+              Light
+            </a>
+          </li>
+          <li>
+            <a
+              class="dropdown-item certy-toggle d-flex gap-2 align-items-center"
+              data-certy-toggle="dark"
+            >
+              <i class="bi bi-moon"></i>
+              Dark
+            </a>
+          </li>
+        </ul>
       </div>
     </div>
   </div>

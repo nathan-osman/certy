@@ -376,8 +376,7 @@ func (s *Storage) CreateCertificate(
 	if params.CanSign {
 		cert.KeyUsage |= x509.KeyUsageCertSign
 	}
-	if !params.AllowChaining {
-		cert.MaxPathLen = 0
+	if cert.IsCA && !params.AllowChaining {
 		cert.MaxPathLenZero = true
 	}
 	if params.CodeSigning {

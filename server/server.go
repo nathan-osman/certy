@@ -112,12 +112,18 @@ func New(cfg *Config) (*Server, error) {
 	r.Match(formMethods, "/pkcs12", s.certPKCS12)
 	r.Match(formMethods, "/delete", s.certDelete)
 
-	// Static files
-	f, err := static.EmbedFolder(staticFS, "static")
-	if err != nil {
-		return nil, err
+	// Static files (use FS if running in debug)
+	var serveFS static.ServeFileSystem
+	if cfg.Debug {
+		serveFS = static.LocalFile("server/static", false)
+	} else {
+		f, err := static.EmbedFolder(staticFS, "static")
+		if err != nil {
+			return nil, err
+		}
+		serveFS = f
 	}
-	r.Use(static.Serve("/static", f))
+	r.Use(static.Serve("/static", serveFS))
 
 	// Listen for connections in a separate goroutine
 	go func() {

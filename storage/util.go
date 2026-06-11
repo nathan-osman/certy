@@ -1,6 +1,6 @@
 package storage
 
-func (s *Storage) ifProvided(v string) []string {
+func ifProvided(v string) []string {
 	if v == "" {
 		return []string{}
 	}

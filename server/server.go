@@ -92,6 +92,7 @@ func New(cfg *Config) (*Server, error) {
 	// Enable auto-reload if debug is enabled
 	if cfg.Debug {
 		tmplSet.Debug = true
+		tmplSet.Globals["DEBUG"] = true
 	}
 
 	// Render HTML templates with pongo

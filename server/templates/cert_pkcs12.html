@@ -9,6 +9,15 @@
 
 {% block fields %}
 {% import 'macros/form.html' checkbox, input %}
-{{ input(form, "Password", "Password", "e.g. SuperSecret123!", true) }}
-{{ checkbox(form, "UseLegacy", "Use legacy hash and cipher for older devices")}}
+<div class="row">
+  <div class="col-md-6">
+    {{ input(form, "Password", "Password", "e.g. SuperSecret123!", false, true) }}
+    <p class="form-text">
+      Some older devices (including older Android releases) don't support more modern algorithms like SHA-256. This option forces the use of older algorithms and increases compatibility at the expense of weaker security. Use only when needed.
+    </p>
+    <div class="mb-4">
+      {{ checkbox(form, "UseLegacy", "Use legacy hash and cipher for older devices")}}
+    </div>
+  </div>
+</div>
 {% endblock %}

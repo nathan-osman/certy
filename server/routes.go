@@ -231,7 +231,7 @@ func (s *Server) certPKCS12(c *gin.Context) {
 		"cert":  v,
 		"form":  form,
 		"path":  p,
-		"page":  "Export",
+		"page":  "Export PKCS#12",
 	})
 }
 

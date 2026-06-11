@@ -157,7 +157,7 @@ func (s *Storage) ExportCertificatePEM(certPath string) ([]byte, error) {
 }
 
 // ExportCertificateChainPEM exports the specified certificate and its parents
-// as a PEM-encoded file.
+// (not including the root) as a PEM-encoded file.
 func (s *Storage) ExportCertificateChainPEM(certPath string) ([]byte, error) {
 	s.mutex.RLock()
 	defer s.mutex.RUnlock()
@@ -166,7 +166,7 @@ func (s *Storage) ExportCertificateChainPEM(certPath string) ([]byte, error) {
 		return nil, err
 	}
 	var b []byte
-	for c != nil {
+	for c != nil && c.parent != nil {
 		v := pem.EncodeToMemory(&pem.Block{
 			Type:  typeCertificate,
 			Bytes: c.cert.Raw,

@@ -7,6 +7,7 @@ import (
 	"io/fs"
 	"log/slog"
 	"net/http"
+	"runtime"
 
 	"github.com/flosch/pongo2/v6"
 	"github.com/gin-contrib/static"
@@ -85,6 +86,8 @@ func New(cfg *Config) (*Server, error) {
 	}
 
 	tmplSet := pongo2.NewSet("", tmplLoader)
+	tmplSet.Globals["GOOS"] = runtime.GOOS
+	tmplSet.Globals["GOARCH"] = runtime.GOARCH
 
 	// Enable auto-reload if debug is enabled
 	if cfg.Debug {

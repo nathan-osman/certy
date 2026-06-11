@@ -13,15 +13,16 @@
   <!-- This needs to run before the DOM renders -->
   <script src="/static/js/theme.js"></script>
 </head>
-<body>
+<body class="d-flex flex-column vh-100">
   {% include "fragments/header.html" %}
   {% include "fragments/title.html" %}
-  <div class="container p-3">
+  <div class="flex-shrink-0 container mb-5 p-3">
     {% if cert %}
     {% include "fragments/breadcrumbs.html" %}
     {% endif %}
     {% block content %}{% endblock %}
   </div>
+  {% include "fragments/footer.html" %}
 
   <!-- Not required for core functionality, but adds a few nice helpers  -->
   <script src="/static/js/bootstrap.bundle.min.js"></script>

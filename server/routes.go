@@ -124,6 +124,7 @@ func (s *Server) certNew(c *gin.Context) {
 			form.PostalCode = ifPresent(sub.PostalCode)
 		} else {
 			form.CanSign = true
+			form.AllowChaining = true
 		}
 	}
 	var desc string

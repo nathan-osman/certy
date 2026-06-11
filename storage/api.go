@@ -269,6 +269,7 @@ type CreateCertificateParams struct {
 	PostalCode         string
 	Validity           string
 	CanSign            bool
+	AllowChaining      bool
 	CodeSigning        bool
 	ClientAuth         bool
 	ServerAuth         bool
@@ -374,6 +375,10 @@ func (s *Storage) CreateCertificate(
 	// Set the flags
 	if params.CanSign {
 		cert.KeyUsage |= x509.KeyUsageCertSign
+	}
+	if !params.AllowChaining {
+		cert.MaxPathLen = 0
+		cert.MaxPathLenZero = true
 	}
 	if params.CodeSigning {
 		cert.KeyUsage |= x509.KeyUsageDigitalSignature

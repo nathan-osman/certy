@@ -43,6 +43,7 @@
         <div class="card-body">
           {{ duration(form, "Validity", "Validity", true) }}
           {{ checkbox(form, "CanSign", "Can sign certificates (Certificate Authority)") }}
+          {{ checkbox(form, "AllowChaining", "Allow chaining (signing intermediates)")}}
           {{ checkbox(form, "CodeSigning", "Code signing")}}
           {{ checkbox(form, "ClientAuth", "Client auth")}}
           {{ checkbox(form, "ServerAuth", "Server auth")}}

@@ -29,13 +29,21 @@ type Certificate struct {
 	Fingerprint string
 	X509        *x509.Certificate
 	Children    []*Ref
+	HasKey      bool
 }
 
-// CanSign indicates whether this certificate may sign others.
-func (c *Certificate) CanSign() bool {
+// MaySign indicates whether this certificate may sign others.
+func (c *Certificate) MaySign() bool {
 	return c.X509.IsCA && c.X509.KeyUsage&x509.KeyUsageCertSign != 0
 }
 
+// CanSign indicates whether this certificate has the ability to sign others
+// (a private key exists on disk).
+func (c *Certificate) CanSign() bool {
+	return c.MaySign() && c.HasKey
+}
+
+// KeyUsage provides a human-friendly list of possible uses.
 func (c *Certificate) KeyUsage() []string {
 	usages := []string{}
 	if c.X509.KeyUsage&x509.KeyUsageCertSign != 0 {
@@ -89,6 +97,7 @@ func convertCert(cert *storageCert) *Certificate {
 		Fingerprint: cert.fingerprint,
 		X509:        cert.cert,
 		Children:    childList(cert.children),
+		HasKey:      cert.hasKey,
 	}
 }
 

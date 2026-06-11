@@ -30,6 +30,7 @@ type storageCert struct {
 	fingerprint string
 	cert        *x509.Certificate
 	children    map[string]*storageCert
+	hasKey      bool
 }
 
 func (s *storageCert) chain() []*storageCert {
@@ -91,6 +92,10 @@ func (s *Storage) loadCert(
 	if err != nil {
 		return nil, err
 	}
+	e, err := fileExists(filepath.Join(dir, filenamePrivateKey))
+	if err != nil {
+		return nil, err
+	}
 	var (
 		h = sha256.Sum256(x.Raw)
 		c = &storageCert{
@@ -98,6 +103,7 @@ func (s *Storage) loadCert(
 			parent:      parent,
 			fingerprint: hex.EncodeToString(h[:]),
 			cert:        x,
+			hasKey:      e,
 		}
 	)
 	certs, err := s.loadCerts(dir, c)

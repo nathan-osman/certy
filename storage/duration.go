@@ -8,10 +8,10 @@ import (
 )
 
 const (
-	durDay   = 24 * time.Hour
-	durWeek  = 7 * durDay
-	durMonth = 30 * durDay
-	durYear  = 365 * durDay
+	durHour = 60 * time.Minute
+	durDay  = 24 * durHour
+	durWeek = 7 * durDay
+	durYear = 365 * durDay
 )
 
 var (
@@ -31,14 +31,14 @@ func parseDuration(v string) (time.Duration, error) {
 		return 0, err
 	}
 	switch m[2] {
+	case "m":
+		return time.Duration(n) * time.Minute, nil
 	case "h":
-		return time.Duration(n) * time.Hour, nil
+		return time.Duration(n) * durHour, nil
 	case "d":
 		return time.Duration(n) * durDay, nil
 	case "w":
 		return time.Duration(n) * durWeek, nil
-	case "m":
-		return time.Duration(n) * durMonth, nil
 	case "y":
 		return time.Duration(n) * durYear, nil
 	default:

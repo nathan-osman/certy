@@ -24,12 +24,10 @@
         </tr>
       {% empty %}
         <tr>
-          <td colspan="3" class="text-muted">No certificates, click "Create New" below to create a certificate.</td>
+          <td colspan="3" class="py-4 text-muted">No certificates, click "Create New" below to create a certificate.</td>
         </tr>
       {% endfor %}
     </tbody>
   </table>
-  <p>
-    <a href="/new?cert={{ prefix }}" class="btn btn-primary">Create New</a>
-  </p>
+  <a href="/new?cert={{ prefix }}" class="btn btn-primary">Create New</a>
 {% endmacro %}

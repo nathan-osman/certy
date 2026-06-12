@@ -68,6 +68,16 @@
             </td>
           </tr>
         {% endif %}
+        <tr>
+          <th>Maximum path length:</th>
+          <td>
+            {% if cert.X509.MaxPathLen == -1 %}
+              <span class="text-muted">unset</span>
+            {% else %}
+              {{ cert.X509.MaxPathLen }}
+            {% endif %}
+          </td>
+        </tr>
       </tbody>
     </table>
     <form method="post" action="/validate?cert={{ path }}" class="buttons">

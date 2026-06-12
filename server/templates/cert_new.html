@@ -42,7 +42,7 @@
         <div class="card-header">Validity & Usage</div>
         <div class="card-body">
           {{ duration(form, "Validity", "Validity", true) }}
-          {% if cert.X509.MaxPathLen %}
+          {% if !cert.Parents || cert.X509.MaxPathLen %}
             {{ checkbox(form, "CanSign", "Can sign certificates (Certificate Authority)") }}
             {{ checkbox(form, "AllowChaining", "Allow chaining (signing intermediates)")}}
           {% endif %}

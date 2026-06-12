@@ -51,6 +51,8 @@
           <td>
             {% for u in cert.KeyUsage() %}
               <div>{{ u }}</div>
+            {% empty %}
+              <span class="text-muted">none</span>
             {% endfor %}
           </td>
         </tr>

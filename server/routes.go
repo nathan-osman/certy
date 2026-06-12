@@ -178,11 +178,16 @@ func (s *Server) certAction(c *gin.Context) {
 		b         []byte
 		suffix    string
 		extension string
+		mime      = "application/x-pem-file"
 	)
 	switch c.Query("action") {
 	case "export_cert_pem":
 		b, err = s.storage.ExportCertificatePEM(p)
-		extension = "crt"
+		extension = "pem"
+	case "export_cert_der":
+		b, err = s.storage.ExportCertificateDER(p)
+		extension = "cer"
+		mime = "application/pkix-cert"
 	case "export_chain_pem":
 		b, err = s.storage.ExportCertificateChainPEM(p)
 		suffix = "-chain"
@@ -199,7 +204,7 @@ func (s *Server) certAction(c *gin.Context) {
 	if err != nil {
 		panic(err)
 	}
-	downloadCert(c, "application/x-pem-file", b, v, suffix, extension)
+	downloadCert(c, mime, b, v, suffix, extension)
 }
 
 func (s *Server) certPKCS12(c *gin.Context) {

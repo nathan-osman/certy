@@ -170,6 +170,17 @@ func (s *Storage) ExportCertificatePEM(certPath string) ([]byte, error) {
 	}), nil
 }
 
+// ExportCertificateDER exports the specified certificate in DER format.
+func (s *Storage) ExportCertificateDER(certPath string) ([]byte, error) {
+	s.mutex.RLock()
+	defer s.mutex.RUnlock()
+	c, _, err := s.getCert(certPath)
+	if err != nil {
+		return nil, err
+	}
+	return c.cert.Raw, nil
+}
+
 // ExportCertificateChainPEM exports the specified certificate and its parents
 // (not including the root) as a PEM-encoded file.
 func (s *Storage) ExportCertificateChainPEM(certPath string) ([]byte, error) {

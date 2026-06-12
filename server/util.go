@@ -15,9 +15,8 @@ import (
 )
 
 const (
-	durDay   = 24 * time.Hour
-	durMonth = 30 * durDay
-	durYear  = 365 * durDay
+	durDay  = 24 * time.Hour
+	durYear = 365 * durDay
 )
 
 func formatBytes(in *pongo2.Value, param *pongo2.Value) (*pongo2.Value, *pongo2.Error) {

@@ -33,7 +33,9 @@
         <tr>
           <th>Valid to:</th>
           <td>
-            {{ cert.X509.NotAfter | formatDate }}
+            <span{% if cert.IsExpired() %} class="text-danger"{% endif %}>
+              {{ cert.X509.NotAfter | formatDate }}
+            </span>
             <span class="text-muted">
               &nbsp;
               (duration: {{ cert.X509.NotAfter.Sub(cert.X509.NotBefore) | formatDuration }})

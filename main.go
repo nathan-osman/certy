@@ -26,6 +26,7 @@ func main() {
 		Flags: []cli.Flag{
 			&cli.StringFlag{
 				Name:    "data-dir",
+				Value:   "data",
 				EnvVars: []string{"DATA_DIR"},
 				Usage:   "path to data directory",
 			},

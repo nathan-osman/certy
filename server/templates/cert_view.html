@@ -21,6 +21,12 @@
   </form>
 {% endmacro %}
 
+{% if cert.IsExpired() %}
+<div class="alert alert-danger">
+  This certificate has expired and is no longer valid.
+</div>
+{% endif %}
+
 <div class="row g-4">
   <div class="col-md-9">
     <div class="d-grid gap-4">

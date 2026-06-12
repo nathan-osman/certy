@@ -32,6 +32,11 @@ type Certificate struct {
 	HasKey      bool
 }
 
+// IsExpired indicates whether the certificate is expired or not.
+func (c *Certificate) IsExpired() bool {
+	return c.X509.NotAfter.Before(time.Now())
+}
+
 // MaySign indicates whether this certificate may sign others.
 func (c *Certificate) MaySign() bool {
 	return c.X509.IsCA && c.X509.KeyUsage&x509.KeyUsageCertSign != 0

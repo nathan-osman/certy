@@ -7,6 +7,7 @@
     <thead>
       <tr>
         <th>Common Name</th>
+        <th>Is CA?</th>
         <th>Issued</th>
         <th>Expires</th>
       </tr>
@@ -19,6 +20,13 @@
               {{ r.X509.Subject.CommonName}}
             </a>
           </th>
+          <td>
+            {% if r.X509.IsCA %}
+              <i class="bi bi-check"></i>
+            {% else %}
+              <i class="bi bi-x"></i>
+            {% endif %}
+          </td>
           <td>{{ r.X509.NotBefore | formatDate }}</td>
           <td>{{ r.X509.NotAfter | formatDate }}</td>
         </tr>

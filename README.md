@@ -1,5 +1,6 @@
 # Certy
 
+[![Build Status](https://github.com/nathan-osman/certy/actions/workflows/test.yml/badge.svg)](https://github.com/nathan-osman/certy/actions/workflows/test.yml)
 [![Go Reference](https://pkg.go.dev/badge/github.com/nathan-osman/certy.svg)](https://pkg.go.dev/github.com/nathan-osman/certy)
 [![MIT License](https://img.shields.io/badge/license-MIT-9370d8.svg?style=flat)](https://opensource.org/licenses/MIT)
 

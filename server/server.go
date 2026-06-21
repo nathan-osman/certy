@@ -104,6 +104,7 @@ func New(cfg *Config) (*Server, error) {
 	// Render HTML templates with pongo
 	r.HTMLRender = pongo2gin.New(pongo2gin.RenderOptions{
 		TemplateSet: tmplSet,
+		ContentType: "text/html; charset=utf-8",
 	})
 
 	// Handle errors gracefully

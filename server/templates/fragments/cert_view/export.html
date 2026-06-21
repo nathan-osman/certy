@@ -5,6 +5,7 @@
     <div class="d-grid gap-2">
       {{ action(path, "export_cert_pem", "Certificate (PEM)") }}
       {{ action(path, "export_cert_der", "Certificate (DER)") }}
+      {{ action(path, "export_cert_pkcs7", "Certificate (PKCS#7)") }}
       {% if cert.Parents|length > 1 %}
         {{ action(path, "export_chain_pem", "Certificate chain (PEM)") }}
       {% endif %}

@@ -10,6 +10,7 @@ require (
 	github.com/nathan-osman/pongo2-embed-loader v1.0.1
 	github.com/urfave/cli/v2 v2.27.7
 	gitlab.com/go-box/pongo2gin/v6 v6.0.13
+	go.mozilla.org/pkcs7 v0.9.0
 	software.sslmate.com/src/go-pkcs12 v0.7.2
 )
 

@@ -13,6 +13,7 @@ import (
 	"time"
 	"unicode"
 
+	"go.mozilla.org/pkcs7"
 	"software.sslmate.com/src/go-pkcs12"
 )
 
@@ -179,6 +180,22 @@ func (s *Storage) ExportCertificateDER(certPath string) ([]byte, error) {
 		return nil, err
 	}
 	return c.cert.Raw, nil
+}
+
+// ExportCertificatePKCS7 exports the specified certificate in PKCS#7 format.
+func (s *Storage) ExportCertificatePKCS7(certPath string) ([]byte, error) {
+	s.mutex.RLock()
+	defer s.mutex.RUnlock()
+	c, _, err := s.getCert(certPath)
+	if err != nil {
+		return nil, err
+	}
+	d, err := pkcs7.NewSignedData(nil)
+	if err != nil {
+		return nil, err
+	}
+	d.AddCertificate(c.cert)
+	return d.Finish()
 }
 
 // ExportCertificateChainPEM exports the specified certificate and its parents

@@ -188,6 +188,10 @@ func (s *Server) certAction(c *gin.Context) {
 		b, err = s.storage.ExportCertificateDER(p)
 		extension = "cer"
 		mime = "application/pkix-cert"
+	case "export_cert_pkcs7":
+		b, err = s.storage.ExportCertificatePKCS7(p)
+		extension = "p7b"
+		mime = "application/x-pkcs7-certificates"
 	case "export_chain_pem":
 		b, err = s.storage.ExportCertificateChainPEM(p)
 		suffix = "-chain"

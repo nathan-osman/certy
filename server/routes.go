@@ -13,7 +13,7 @@ import (
 )
 
 var (
-	errInvalidAction = errors.New("invalid action specified")
+	errInvalidFmt = errors.New("invalid format specified")
 )
 
 // When capturing the stack, we need to skip five frames:

@@ -16,7 +16,7 @@
       {% for r in refs %}
         <tr>
           <th>
-            <a href="/view?cert={{ path }}{{ r.ID }}">
+            <a href="/view?cert={{ r.Path }}">
               {{ r.X509.Subject.CommonName}}
             </a>
           </th>

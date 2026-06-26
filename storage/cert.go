@@ -26,6 +26,7 @@ var (
 
 type storageCert struct {
 	id          string
+	path        string
 	parent      *storageCert
 	fingerprint string
 	cert        *x509.Certificate
@@ -97,9 +98,17 @@ func (s *Storage) loadCert(
 		return nil, err
 	}
 	var (
-		h = sha256.Sum256(x.Raw)
+		h      = sha256.Sum256(x.Raw)
+		id     = hex.EncodeToString(h[:12])
+		prefix = ""
+	)
+	if parent != nil {
+		prefix = parent.path + "/"
+	}
+	var (
 		c = &storageCert{
-			id:          hex.EncodeToString(h[:12]),
+			id:          id,
+			path:        prefix + id,
 			parent:      parent,
 			fingerprint: hex.EncodeToString(h[:]),
 			cert:        x,

@@ -20,6 +20,7 @@ import (
 // Ref stores an ID and certificate pair.
 type Ref struct {
 	ID   string
+	Path string
 	X509 *x509.Certificate
 }
 
@@ -73,15 +74,19 @@ func (c *Certificate) KeyUsage() []string {
 }
 
 func parentList(p *storageCert) []*Ref {
-	parents := []*Ref{}
-	for p != nil {
+	var (
+		parents = []*Ref{}
+		v       = p
+	)
+	for v != nil {
 		parents = append([]*Ref{
 			{
 				ID:   p.id,
+				Path: p.path,
 				X509: p.cert,
 			},
 		}, parents...)
-		p = p.parent
+		v = v.parent
 	}
 	return parents
 }
@@ -91,6 +96,7 @@ func childList(m map[string]*storageCert) []*Ref {
 	for k, v := range m {
 		children = append(children, &Ref{
 			ID:   k,
+			Path: v.path,
 			X509: v.cert,
 		})
 	}

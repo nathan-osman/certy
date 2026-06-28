@@ -82,7 +82,7 @@
         {% endif %}
       </tbody>
     </table>
-    <form method="post" action="/validate?cert={{ path }}" class="buttons">
+    <form method="post" action="/{{ cert.Path }}/validate" class="buttons">
       <button type="submit" class="btn btn-primary">
         Validate
       </button>

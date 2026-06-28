@@ -7,8 +7,10 @@ import (
 	"io/fs"
 	"log/slog"
 	"net/http"
+	"regexp"
 	"runtime"
 	"runtime/debug"
+	"slices"
 
 	"github.com/flosch/pongo2/v6"
 	"github.com/gin-contrib/static"
@@ -25,10 +27,13 @@ var (
 	//go:embed templates
 	tmplFS embed.FS
 
-	formMethods = []string{
-		http.MethodGet,
-		http.MethodPost,
-	}
+	splitPathRegExp = regexp.MustCompile(
+		`/([0-9a-f]{12}(?:/[0-9a-f]{12})*)(?:/(\w+))?`,
+	)
+
+	methodsGet     = []string{http.MethodGet}
+	methodsPost    = []string{http.MethodPost}
+	methodsGetPost = []string{http.MethodGet, http.MethodPost}
 )
 
 func init() {
@@ -37,12 +42,18 @@ func init() {
 	pongo2.RegisterFilter("formatDuration", formatDuration)
 }
 
+type internalRoute struct {
+	methods []string
+	handler func(*gin.Context, string)
+}
+
 // Server provides the web interface for interacting with the CA and
 // certificate functions in the storage package.
 type Server struct {
 	server  http.Server
 	logger  *slog.Logger
 	storage *storage.Storage
+	routes  map[string]internalRoute
 }
 
 // New create a new Server instance.
@@ -110,15 +121,6 @@ func New(cfg *Config) (*Server, error) {
 	// Handle errors gracefully
 	r.Use(gin.CustomRecovery(s.errorHandler))
 
-	// Routes for the server
-	r.GET("/", s.index)
-	r.GET("/view", s.certView)
-	r.POST("/validate", s.certValidate)
-	r.POST("/action", s.certAction)
-	r.Match(formMethods, "/new", s.certNew)
-	r.Match(formMethods, "/pkcs12", s.certPKCS12)
-	r.Match(formMethods, "/delete", s.certDelete)
-
 	// Static files (use FS if running in debug)
 	var serveFS static.ServeFileSystem
 	if cfg.Debug {
@@ -132,6 +134,43 @@ func New(cfg *Config) (*Server, error) {
 	}
 	r.Use(static.Serve("/static", serveFS))
 
+	// In order to provide URLs of the format:
+	//
+	// / [root] / [intermediate] / [leaf] / [action]
+	//
+	// ...some custom routing logic is required (unfortunately). This is all
+	// handled in routePath(), which calls the appropriate handler.
+	r.GET("/*path", s.routePath)
+	r.POST("/*path", s.routePath)
+
+	// Populate the route map
+	s.routes = map[string]internalRoute{
+		"": {
+			methods: methodsGet,
+			handler: s.certView,
+		},
+		"validate": {
+			methods: methodsPost,
+			handler: s.certValidate,
+		},
+		"export": {
+			methods: methodsPost,
+			handler: s.certExport,
+		},
+		"new": {
+			methods: methodsGetPost,
+			handler: s.certNew,
+		},
+		"pkcs12": {
+			methods: methodsGetPost,
+			handler: s.certPKCS12,
+		},
+		"delete": {
+			methods: methodsGetPost,
+			handler: s.certDelete,
+		},
+	}
+
 	// Listen for connections in a separate goroutine
 	go func() {
 		defer s.logger.Info("server stopped")
@@ -142,6 +181,46 @@ func New(cfg *Config) (*Server, error) {
 	}()
 
 	return s, nil
+}
+
+func (s *Server) routePath(c *gin.Context) {
+
+	p := c.Param("path")
+
+	// Show the home page for GET /
+	if p == "/" && c.Request.Method == http.MethodGet {
+		s.index(c)
+		return
+	}
+
+	// Page for creating new root certificates
+	if p == "/new" && slices.Contains(methodsGetPost, c.Request.Method) {
+		s.certNew(c, "")
+		return
+	}
+
+	// Split the path into / [cert] / [action]
+	v := splitPathRegExp.FindStringSubmatch(p)
+	if len(v) < 2 {
+		c.AbortWithStatus(http.StatusNotFound)
+		return
+	}
+
+	// Check if the action is in the route slice
+	r, ok := s.routes[v[2]]
+	if !ok {
+		c.AbortWithStatus(http.StatusNotFound)
+		return
+	}
+
+	// Check if the method is allowed
+	if !slices.Contains(r.methods, c.Request.Method) {
+		c.AbortWithStatus(http.StatusMethodNotAllowed)
+		return
+	}
+
+	// Route the request
+	r.handler(c, v[1])
 }
 
 // Close shuts down the server.

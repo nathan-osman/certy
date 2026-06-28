@@ -3,6 +3,6 @@
   <div class="card-body">
     <p class="card-text">Certificates signed by this one are displayed below.</p>
     {% import 'macros/table.html' ref_table %}
-    {{ ref_table(path, cert.Children) }}
+    {{ ref_table(cert.Children, cert.Path) }}
   </div>
 </div>

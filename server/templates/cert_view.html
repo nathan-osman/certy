@@ -13,8 +13,8 @@
   {% endif %}
 {% endmacro %}
 
-{% macro action(cert, name, label) %}
-  <form method="post" action="/action?cert={{ cert }}&action={{ name }}">
+{% macro m_export(path, name, label) %}
+  <form method="post" action="/{{ path }}/export?f={{ name }}">
     <button type="submit" class="btn btn-primary w-100">
       {{ label }}
     </button>

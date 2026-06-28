@@ -1,8 +1,5 @@
 {# Display a table of refs (fingerprint+certificates) #}
-{% macro ref_table(prefix, refs) export %}
-  {% if path %}
-    {% set path = prefix + "/" %}
-  {% endif %}
+{% macro ref_table(refs, path) export %}
   <table class="table table-striped mt-3">
     <thead>
       <tr>
@@ -16,7 +13,7 @@
       {% for r in refs %}
         <tr>
           <th>
-            <a href="/view?cert={{ r.Path }}">
+            <a href="/{{ r.Path }}">
               {{ r.X509.Subject.CommonName}}
             </a>
           </th>
@@ -32,10 +29,14 @@
         </tr>
       {% empty %}
         <tr>
-          <td colspan="3" class="py-4 text-muted">No certificates, click "Create New" below to create a certificate.</td>
+          <td colspan="4" class="py-4 text-muted text-center">No certificates, click "Create New" below to create a certificate.</td>
         </tr>
       {% endfor %}
     </tbody>
   </table>
-  <a href="/new?cert={{ prefix }}" class="btn btn-primary">Create New</a>
+  {% set prefix = "" %}
+  {% if path %}
+    {% set prefix = "/" + path %}
+  {% endif %}
+  <a href="{{ prefix }}/new" class="btn btn-primary">Create New</a>
 {% endmacro %}

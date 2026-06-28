@@ -7,13 +7,32 @@ import (
 	"testing"
 )
 
-func TestStorageCreatesPersistsExportsAndDeletesCertificates(t *testing.T) {
-	dataDir := t.TempDir()
-	s := newTestStorage(t, dataDir)
+const (
+	rootCertCN  = "Root CA"
+	childCertCN = "service.example.test"
+	childCertIP = "127.0.0.1"
+)
 
-	rootID, err := s.CreateCertificate("", &CreateCertificateParams{
-		CommonName:    "Root CA",
-		Organization:  "Example Org",
+func newTestStorage(t *testing.T, dataDir string) *Storage {
+	t.Helper()
+	s, err := New(&Config{
+		DataDir: dataDir,
+	})
+	if err != nil {
+		t.Fatalf("new storage: %v", err)
+	}
+	return s
+}
+
+func TestStorageCreatesPersistsExportsAndDeletesCertificates(t *testing.T) {
+	var (
+		dataDir = t.TempDir()
+		s       = newTestStorage(t, dataDir)
+	)
+
+	// Create a root certificate
+	_, err := s.CreateCertificate("", &CreateCertificateParams{
+		CommonName:    rootCertCN,
 		Validity:      "1h",
 		CanSign:       true,
 		AllowChaining: true,
@@ -22,50 +41,58 @@ func TestStorageCreatesPersistsExportsAndDeletesCertificates(t *testing.T) {
 		t.Fatalf("create root certificate: %v", err)
 	}
 
-	roots := s.GetRootCertificates()
-	if len(roots) != 1 {
-		t.Fatalf("root certificate count = %d, want 1", len(roots))
-	}
-	if roots[0].ID != rootID {
-		t.Fatalf("root ID = %q, want %q", roots[0].ID, rootID)
+	// ...and confirm it was added to the internal map
+	rootCerts := s.GetRootCertificates()
+	if len(rootCerts) != 1 {
+		t.Fatalf("root certificate count = %d, want 1", len(rootCerts))
 	}
 
-	root, err := s.GetCertificate(rootID)
+	// Compare the root CA to the input
+	rootCert, err := s.GetCertificate(rootCerts[0].Path)
 	if err != nil {
 		t.Fatalf("get root certificate: %v", err)
 	}
-	if root.X509.Subject.CommonName != "Root CA" {
-		t.Fatalf("root common name = %q, want %q", root.X509.Subject.CommonName, "Root CA")
+	if rootCert.X509.Subject.CommonName != rootCertCN {
+		t.Fatalf(
+			"root common name = %q, want %q",
+			rootCert.X509.Subject.CommonName,
+			rootCertCN,
+		)
 	}
-	if !root.CanSign() {
+	if !rootCert.CanSign() {
 		t.Fatal("root certificate should be able to sign")
 	}
 
-	childID, err := s.CreateCertificate(rootID, &CreateCertificateParams{
-		CommonName: "service.example.test",
+	// Create a child of the root CA
+	c, err := s.CreateCertificate(rootCert.Path, &CreateCertificateParams{
+		CommonName: childCertCN,
 		Validity:   "30m",
 		ServerAuth: true,
-		SANs:       "service.example.test 127.0.0.1",
+		SANs:       childCertCN + " " + childCertIP,
 	})
 	if err != nil {
 		t.Fatalf("create child certificate: %v", err)
 	}
 
-	child, err := s.GetCertificate(childID)
+	// Retrieve the newly created child certificate
+	childCert, err := s.GetCertificate(c.Path)
 	if err != nil {
 		t.Fatalf("get child certificate: %v", err)
 	}
-	if len(child.Parents) != 1 || child.Parents[0].ID != rootID {
-		t.Fatalf("child parents = %#v, want root %q", child.Parents, rootID)
+
+	// Confirm its parents, attributes, & validity
+	if len(childCert.Parents) != 1 || childCert.Parents[0].ID != rootCert.ID {
+		t.Fatalf("child parents = %#v, want root %q", childCert.Parents, rootCert.ID)
 	}
-	if child.CanSign() {
+	if childCert.CanSign() {
 		t.Fatal("leaf certificate should not be able to sign")
 	}
-	if err := s.ValidateCertificate(childID); err != nil {
+	if err := s.ValidateCertificate(childCert.Path); err != nil {
 		t.Fatalf("validate child certificate: %v", err)
 	}
 
-	pemBytes, err := s.ExportCertificatePEM(childID)
+	// Attempt to export the child certificate in PEM format
+	pemBytes, err := s.ExportCertificatePEM(childCert.Path)
 	if err != nil {
 		t.Fatalf("export child certificate PEM: %v", err)
 	}
@@ -74,7 +101,8 @@ func TestStorageCreatesPersistsExportsAndDeletesCertificates(t *testing.T) {
 		t.Fatalf("exported PEM block = %#v, want certificate block", block)
 	}
 
-	publicKey, err := s.ExportPublicKeyPEM(childID)
+	// Attempt to export the child certificate's public key
+	publicKey, err := s.ExportPublicKeyPEM(childCert.Path)
 	if err != nil {
 		t.Fatalf("export child public key: %v", err)
 	}
@@ -82,30 +110,22 @@ func TestStorageCreatesPersistsExportsAndDeletesCertificates(t *testing.T) {
 		t.Fatalf("public key export does not contain a PEM public key: %q", publicKey)
 	}
 
-	reloaded := newTestStorage(t, dataDir)
-	if _, err := reloaded.GetCertificate(childID); err != nil {
+	// Reload the storage directory and make sure everything is still there
+	s = newTestStorage(t, dataDir)
+	if _, err := s.GetCertificate(childCert.Path); err != nil {
 		t.Fatalf("get child certificate after reload: %v", err)
 	}
 
-	if err := reloaded.DeleteCertificate(rootID); err != nil {
+	// Delete the root certificate
+	if err := s.DeleteCertificate(rootCert.Path); err != nil {
 		t.Fatalf("delete root certificate: %v", err)
 	}
-	if _, err := reloaded.GetCertificate(rootID); !errors.Is(err, errCertDoesNotExist) {
+
+	// Make sure the root and child are gone
+	if _, err := s.GetCertificate(rootCert.Path); !errors.Is(err, errCertDoesNotExist) {
 		t.Fatalf("get deleted root error = %v, want %v", err, errCertDoesNotExist)
 	}
-	if _, err := reloaded.GetCertificate(childID); !errors.Is(err, errCertDoesNotExist) {
+	if _, err := s.GetCertificate(rootCert.Path); !errors.Is(err, errCertDoesNotExist) {
 		t.Fatalf("get deleted child error = %v, want %v", err, errCertDoesNotExist)
 	}
-}
-
-func newTestStorage(t *testing.T, dataDir string) *Storage {
-	t.Helper()
-
-	s, err := New(&Config{
-		DataDir: dataDir,
-	})
-	if err != nil {
-		t.Fatalf("new storage: %v", err)
-	}
-	return s
 }

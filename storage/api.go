@@ -4,7 +4,6 @@ import (
 	"crypto/x509"
 	"crypto/x509/pkix"
 	"encoding/pem"
-	"fmt"
 	"math/big"
 	"net"
 	"os"
@@ -17,7 +16,7 @@ import (
 	"software.sslmate.com/src/go-pkcs12"
 )
 
-// Ref stores an ID and certificate pair.
+// Ref stores an ID and certificate data.
 type Ref struct {
 	ID   string
 	Path string
@@ -27,6 +26,8 @@ type Ref struct {
 // Certificate represents an X.509 certificate in a format suitable for
 // rendering to templates.
 type Certificate struct {
+	ID          string
+	Path        string
 	Parents     []*Ref
 	Fingerprint string
 	X509        *x509.Certificate
@@ -39,7 +40,9 @@ func (c *Certificate) IsExpired() bool {
 	return c.X509.NotAfter.Before(time.Now())
 }
 
-// MaySign indicates whether this certificate may sign others.
+// MaySign indicates whether this certificate may sign others. This does not
+// necessarily mean that it *can* sign certificates, if for example the
+// private key does not exist.
 func (c *Certificate) MaySign() bool {
 	return c.X509.IsCA && c.X509.KeyUsage&x509.KeyUsageCertSign != 0
 }
@@ -82,7 +85,7 @@ func parentList(p *storageCert) []*Ref {
 		parents = append([]*Ref{
 			{
 				ID:   p.id,
-				Path: p.path,
+				Path: p.vPath,
 				X509: p.cert,
 			},
 		}, parents...)
@@ -96,7 +99,7 @@ func childList(m map[string]*storageCert) []*Ref {
 	for k, v := range m {
 		children = append(children, &Ref{
 			ID:   k,
-			Path: v.path,
+			Path: v.vPath,
 			X509: v.cert,
 		})
 	}
@@ -105,6 +108,8 @@ func childList(m map[string]*storageCert) []*Ref {
 
 func convertCert(cert *storageCert) *Certificate {
 	return &Certificate{
+		ID:          cert.id,
+		Path:        cert.vPath,
 		Parents:     parentList(cert.parent),
 		Fingerprint: cert.fingerprint,
 		X509:        cert.cert,
@@ -124,7 +129,7 @@ func (s *Storage) GetRootCertificates() []*Ref {
 func (s *Storage) GetCertificate(certPath string) (*Certificate, error) {
 	s.mutex.RLock()
 	defer s.mutex.RUnlock()
-	c, _, err := s.getCert(certPath)
+	c, err := s.getCert(certPath)
 	if err != nil {
 		return nil, err
 	}
@@ -135,7 +140,7 @@ func (s *Storage) GetCertificate(certPath string) (*Certificate, error) {
 func (s *Storage) ValidateCertificate(certPath string) error {
 	s.mutex.RLock()
 	defer s.mutex.RUnlock()
-	c, _, err := s.getCert(certPath)
+	c, err := s.getCert(certPath)
 	if err != nil {
 		return err
 	}
@@ -167,7 +172,7 @@ func (s *Storage) ValidateCertificate(certPath string) error {
 func (s *Storage) ExportCertificatePEM(certPath string) ([]byte, error) {
 	s.mutex.RLock()
 	defer s.mutex.RUnlock()
-	c, _, err := s.getCert(certPath)
+	c, err := s.getCert(certPath)
 	if err != nil {
 		return nil, err
 	}
@@ -181,7 +186,7 @@ func (s *Storage) ExportCertificatePEM(certPath string) ([]byte, error) {
 func (s *Storage) ExportCertificateDER(certPath string) ([]byte, error) {
 	s.mutex.RLock()
 	defer s.mutex.RUnlock()
-	c, _, err := s.getCert(certPath)
+	c, err := s.getCert(certPath)
 	if err != nil {
 		return nil, err
 	}
@@ -192,7 +197,7 @@ func (s *Storage) ExportCertificateDER(certPath string) ([]byte, error) {
 func (s *Storage) ExportCertificatePKCS7(certPath string) ([]byte, error) {
 	s.mutex.RLock()
 	defer s.mutex.RUnlock()
-	c, _, err := s.getCert(certPath)
+	c, err := s.getCert(certPath)
 	if err != nil {
 		return nil, err
 	}
@@ -209,7 +214,7 @@ func (s *Storage) ExportCertificatePKCS7(certPath string) ([]byte, error) {
 func (s *Storage) ExportCertificateChainPEM(certPath string) ([]byte, error) {
 	s.mutex.RLock()
 	defer s.mutex.RUnlock()
-	c, _, err := s.getCert(certPath)
+	c, err := s.getCert(certPath)
 	if err != nil {
 		return nil, err
 	}
@@ -240,11 +245,11 @@ func (s *Storage) ExportCertificatePKCS12(
 ) ([]byte, error) {
 	s.mutex.RLock()
 	defer s.mutex.RUnlock()
-	c, d, err := s.getCert(certPath)
+	c, err := s.getCert(certPath)
 	if err != nil {
 		return nil, err
 	}
-	k, err := loadPrivateKey(filepath.Join(d, filenamePrivateKey))
+	k, err := loadPrivateKey(filepath.Join(c.fPath, filenamePrivateKey))
 	if err != nil {
 		return nil, err
 	}
@@ -270,11 +275,11 @@ func (s *Storage) ExportCertificatePKCS12(
 func (s *Storage) ExportPublicKeyPEM(certPath string) ([]byte, error) {
 	s.mutex.RLock()
 	defer s.mutex.RUnlock()
-	_, d, err := s.getCert(certPath)
+	c, err := s.getCert(certPath)
 	if err != nil {
 		return nil, err
 	}
-	k, err := loadPrivateKey(filepath.Join(d, filenamePrivateKey))
+	k, err := loadPrivateKey(filepath.Join(c.fPath, filenamePrivateKey))
 	if err != nil {
 		return nil, err
 	}
@@ -293,11 +298,11 @@ func (s *Storage) ExportPublicKeyPEM(certPath string) ([]byte, error) {
 func (s *Storage) ExportPrivateKeyPEM(certPath string) ([]byte, error) {
 	s.mutex.RLock()
 	defer s.mutex.RUnlock()
-	_, d, err := s.getCert(certPath)
+	c, err := s.getCert(certPath)
 	if err != nil {
 		return nil, err
 	}
-	b, err := os.ReadFile(filepath.Join(d, filenamePrivateKey))
+	b, err := os.ReadFile(filepath.Join(c.fPath, filenamePrivateKey))
 	if err != nil {
 		return nil, err
 	}
@@ -324,12 +329,12 @@ type CreateCertificateParams struct {
 	SANs               string
 }
 
-// CreateCertificate creates a new certificate & private key. The certificate
-// path to the newly created certificate is returned upon success.
+// CreateCertificate creates a new certificate & private key. The newly
+// created certificate is returned upon success.
 func (s *Storage) CreateCertificate(
 	certPath string,
 	params *CreateCertificateParams,
-) (string, error) {
+) (*Certificate, error) {
 	s.mutex.Lock()
 	defer s.mutex.Unlock()
 
@@ -339,12 +344,12 @@ func (s *Storage) CreateCertificate(
 		parentDir = s.certDir
 	)
 	if certPath != "" {
-		v, vDir, err := s.getCert(certPath)
+		v, err := s.getCert(certPath)
 		if err != nil {
-			return "", err
+			return nil, err
 		}
 		p = v
-		parentDir = vDir
+		parentDir = v.fPath
 	}
 
 	// The directory for the certificate and private key needs to be created
@@ -354,20 +359,20 @@ func (s *Storage) CreateCertificate(
 	// directory will no longer exist under its temp name
 	d, err := os.MkdirTemp(parentDir, "temp")
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 	defer os.RemoveAll(d)
 
 	// Parse the validity duration
 	v, err := parseDuration(params.Validity)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
 	// Generate a new private key
 	k, err := generatePrivateKey(filepath.Join(d, filenamePrivateKey))
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
 	// Use the new key if this is a root CA; otherwise, load the parent's
@@ -375,7 +380,7 @@ func (s *Storage) CreateCertificate(
 	if p != nil {
 		k, err := loadPrivateKey(filepath.Join(parentDir, filenamePrivateKey))
 		if err != nil {
-			return "", err
+			return nil, err
 		}
 		certPrivateKey = k
 	}
@@ -386,7 +391,7 @@ func (s *Storage) CreateCertificate(
 	if p != nil {
 		v, err := s.allocNextSerial(parentDir)
 		if err != nil {
-			return "", err
+			return nil, err
 		}
 		serial = v
 	}
@@ -477,13 +482,13 @@ func (s *Storage) CreateCertificate(
 		&k.PublicKey,
 		certPrivateKey,
 	); err != nil {
-		return "", err
+		return nil, err
 	}
 
 	// ...and load it from disk
 	c, err := s.loadCert(d, p)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
 	// The order of the next two tasks is important - the rename should be the
@@ -493,9 +498,13 @@ func (s *Storage) CreateCertificate(
 	// be done when the layout on disk is complete
 
 	// Rename the directory to the certificate's ID
-	if err := os.Rename(d, filepath.Join(parentDir, c.id)); err != nil {
-		return "", err
+	newDir := filepath.Join(parentDir, c.id)
+	if err := os.Rename(d, newDir); err != nil {
+		return nil, err
 	}
+
+	// ...update the certificate's fPath to point to the new directory...
+	c.fPath = newDir
 
 	// ...and add it to the internal map
 	if p == nil {
@@ -504,11 +513,8 @@ func (s *Storage) CreateCertificate(
 		p.children[c.id] = c
 	}
 
-	// Return the path to the new certificate
-	if certPath == "" {
-		return c.id, nil
-	}
-	return fmt.Sprintf("%s/%s", certPath, c.id), nil
+	// Return the new certificate
+	return convertCert(c), nil
 }
 
 // DeleteCertificate removes a certificate and its private key from disk. Note
@@ -521,13 +527,13 @@ func (s *Storage) DeleteCertificate(
 	defer s.mutex.Unlock()
 
 	// Find the certificate and its directory on disk
-	c, d, err := s.getCert(certPath)
+	c, err := s.getCert(certPath)
 	if err != nil {
 		return err
 	}
 
 	// Remove it from disk
-	if err := os.RemoveAll(d); err != nil {
+	if err := os.RemoveAll(c.fPath); err != nil {
 		return err
 	}
 

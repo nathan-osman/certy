@@ -24,9 +24,13 @@ var (
 	errCertDoesNotExist = errors.New("certificate does not exist")
 )
 
+// Note: vPath refers to a certificate via the internal storage map. fPath
+// is an absolute path to the certificate's directory on disk.
+
 type storageCert struct {
 	id          string
-	path        string
+	vPath       string
+	fPath       string
 	parent      *storageCert
 	fingerprint string
 	cert        *x509.Certificate
@@ -77,10 +81,7 @@ func (s *Storage) loadCerts(
 	return certs, nil
 }
 
-func (s *Storage) loadCert(
-	dir string,
-	parent *storageCert,
-) (*storageCert, error) {
+func (s *Storage) loadCert(dir string, parent *storageCert) (*storageCert, error) {
 	b, err := os.ReadFile(filepath.Join(dir, filenameCert))
 	if err != nil {
 		return nil, err
@@ -98,17 +99,18 @@ func (s *Storage) loadCert(
 		return nil, err
 	}
 	var (
-		h      = sha256.Sum256(x.Raw)
-		id     = hex.EncodeToString(h[:12])
-		prefix = ""
+		h       = sha256.Sum256(x.Raw)
+		id      = hex.EncodeToString(h[:6])
+		vPrefix string
 	)
 	if parent != nil {
-		prefix = parent.path + "/"
+		vPrefix = parent.vPath + "/"
 	}
 	var (
 		c = &storageCert{
 			id:          id,
-			path:        prefix + id,
+			vPath:       vPrefix + id,
+			fPath:       dir,
 			parent:      parent,
 			fingerprint: hex.EncodeToString(h[:]),
 			cert:        x,
@@ -123,23 +125,21 @@ func (s *Storage) loadCert(
 	return c, nil
 }
 
-func (s *Storage) getCert(certPath string) (*storageCert, string, error) {
+func (s *Storage) getCert(vPath string) (*storageCert, error) {
 	var (
-		parts = strings.Split(certPath, "/")
+		parts = strings.Split(vPath, "/")
 		c     *storageCert
 		m     = s.rootCerts
-		d     = s.certDir
 	)
 	for _, p := range parts {
 		v, ok := m[p]
 		if !ok {
-			return nil, "", errCertDoesNotExist
+			return nil, errCertDoesNotExist
 		}
 		c = v
 		m = v.children
-		d = filepath.Join(d, v.id)
 	}
-	return c, d, nil
+	return c, nil
 }
 
 func (s *Storage) createCertificate(

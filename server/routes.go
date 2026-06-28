@@ -71,8 +71,7 @@ func (s *Server) index(c *gin.Context) {
 	})
 }
 
-func (s *Server) certView(c *gin.Context) {
-	p := c.Query("cert")
+func (s *Server) certView(c *gin.Context, p string) {
 	v, err := s.storage.GetCertificate(p)
 	if err != nil {
 		panic(err)
@@ -80,15 +79,13 @@ func (s *Server) certView(c *gin.Context) {
 	c.HTML(http.StatusOK, "cert_view.html", pongo2.Context{
 		"title":          v.X509.Subject.CommonName,
 		"desc":           "View and manage this certificate and its children",
-		"path":           p,
 		"cert":           v,
 		"combineAddress": combineAddress,
 	})
 }
 
-func (s *Server) certNew(c *gin.Context) {
+func (s *Server) certNew(c *gin.Context, p string) {
 	var (
-		p    = c.Query("cert")
 		cert *storage.Certificate
 		form = &storage.CreateCertificateParams{}
 	)
@@ -109,7 +106,7 @@ func (s *Server) certNew(c *gin.Context) {
 		}
 		c.Redirect(
 			http.StatusSeeOther,
-			fmt.Sprintf("/view?cert=%s", v),
+			fmt.Sprintf("/%s", v.Path),
 		)
 		return
 	} else {
@@ -141,35 +138,29 @@ func (s *Server) certNew(c *gin.Context) {
 		"desc":  desc,
 		"cert":  cert,
 		"form":  form,
-		"path":  p,
-		"page":  "New",
+		"page":  "New Certificate",
 	})
 }
 
-func (s *Server) certValidate(c *gin.Context) {
-	p := c.Query("cert")
+func (s *Server) certValidate(c *gin.Context, p string) {
 	v, err := s.storage.GetCertificate(p)
 	if err != nil {
 		panic(err)
 	}
 	var msg string
-	if err := s.storage.ValidateCertificate(
-		c.Query("cert"),
-	); err != nil {
+	if err := s.storage.ValidateCertificate(v.Path); err != nil {
 		msg = err.Error()
 	}
 	c.HTML(http.StatusOK, "cert_validate.html", pongo2.Context{
 		"title": "Validation Results",
 		"desc":  "The results of your certificate validation are shown below",
 		"cert":  v,
-		"path":  p,
 		"msg":   msg,
 		"page":  "Validation",
 	})
 }
 
-func (s *Server) certAction(c *gin.Context) {
-	p := c.Query("cert")
+func (s *Server) certExport(c *gin.Context, p string) {
 	v, err := s.storage.GetCertificate(p)
 	if err != nil {
 		panic(err)
@@ -180,30 +171,30 @@ func (s *Server) certAction(c *gin.Context) {
 		extension string
 		mime      = "application/x-pem-file"
 	)
-	switch c.Query("action") {
-	case "export_cert_pem":
+	switch c.Query("f") {
+	case "cert_pem":
 		b, err = s.storage.ExportCertificatePEM(p)
 		extension = "pem"
-	case "export_cert_der":
+	case "cert_der":
 		b, err = s.storage.ExportCertificateDER(p)
 		extension = "cer"
 		mime = "application/pkix-cert"
-	case "export_cert_pkcs7":
+	case "cert_pkcs7":
 		b, err = s.storage.ExportCertificatePKCS7(p)
 		extension = "p7b"
 		mime = "application/x-pkcs7-certificates"
-	case "export_chain_pem":
+	case "chain_pem":
 		b, err = s.storage.ExportCertificateChainPEM(p)
 		suffix = "-chain"
 		extension = "pem"
-	case "export_pub_key":
+	case "pub_key":
 		b, err = s.storage.ExportPublicKeyPEM(p)
 		extension = "pub"
-	case "export_priv_key":
+	case "priv_key":
 		b, err = s.storage.ExportPrivateKeyPEM(p)
 		extension = "key"
 	default:
-		panic(errInvalidAction)
+		panic(errInvalidFmt)
 	}
 	if err != nil {
 		panic(err)
@@ -211,11 +202,8 @@ func (s *Server) certAction(c *gin.Context) {
 	downloadCert(c, mime, b, v, suffix, extension)
 }
 
-func (s *Server) certPKCS12(c *gin.Context) {
-	var (
-		p    = c.Query("cert")
-		form = &storage.ExportCertificatePKCS12Params{}
-	)
+func (s *Server) certPKCS12(c *gin.Context, p string) {
+	form := &storage.ExportCertificatePKCS12Params{}
 	v, err := s.storage.GetCertificate(p)
 	if err != nil {
 		panic(err)
@@ -240,13 +228,11 @@ func (s *Server) certPKCS12(c *gin.Context) {
 		"desc":  desc,
 		"cert":  v,
 		"form":  form,
-		"path":  p,
 		"page":  "Export PKCS#12",
 	})
 }
 
-func (s *Server) certDelete(c *gin.Context) {
-	p := c.Query("cert")
+func (s *Server) certDelete(c *gin.Context, p string) {
 	v, err := s.storage.GetCertificate(p)
 	if err != nil {
 		panic(err)
@@ -259,8 +245,8 @@ func (s *Server) certDelete(c *gin.Context) {
 			c.Redirect(
 				http.StatusSeeOther,
 				fmt.Sprintf(
-					"/view?cert=%s",
-					v.Parents[len(v.Parents)-1].ID,
+					"/%s",
+					v.Parents[len(v.Parents)-1].Path,
 				),
 			)
 		} else {
@@ -272,7 +258,6 @@ func (s *Server) certDelete(c *gin.Context) {
 		"title": fmt.Sprintf("Delete %s", v.X509.Subject.CommonName),
 		"desc":  "Delete certificate and private key",
 		"cert":  v,
-		"path":  p,
 		"page":  "Delete",
 	})
 }

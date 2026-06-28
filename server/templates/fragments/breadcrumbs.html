@@ -3,14 +3,14 @@
     <li class="breadcrumb-item"><i class="bi bi-house-fill"></i></li>
     {% for c in cert.Parents %}
       <li class="breadcrumb-item">
-        <a href="/view?cert={{ c.Path }}">
+        <a href="/{{ c.Path }}">
           {{ c.X509.Subject.CommonName }}
         </a>
       </li>
     {% endfor %}
     {% if page %}
       <li class="breadcrumb-item">
-        <a href="/view?cert={{ path }}">
+        <a href="/{{ cert.Path }}">
           {{ cert.X509.Subject.CommonName }}
         </a>
       </li>

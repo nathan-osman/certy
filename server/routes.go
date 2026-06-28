@@ -4,8 +4,6 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
-	"runtime"
-	"strings"
 
 	"github.com/flosch/pongo2/v6"
 	"github.com/gin-gonic/gin"
@@ -15,38 +13,6 @@ import (
 var (
 	errInvalidFmt = errors.New("invalid format specified")
 )
-
-// When capturing the stack, we need to skip five frames:
-// - runtime.Callers() itself
-// - captureStack()
-// - errorHandler()
-// - Gin's internal recovery function
-// - the call to panic()
-
-func captureStack() string {
-	var (
-		pcs    = make([]uintptr, 64)
-		n      = runtime.Callers(5, pcs)
-		frames = runtime.CallersFrames(pcs[:n])
-		lines  []string
-	)
-	for {
-		f, more := frames.Next()
-		lines = append(
-			lines,
-			fmt.Sprintf(
-				"%s:%d\n\t%s",
-				f.File,
-				f.Line,
-				f.Function,
-			),
-		)
-		if !more {
-			break
-		}
-	}
-	return strings.Join(lines, "\n")
-}
 
 func (s *Server) errorHandler(c *gin.Context, err any) {
 	msg := "an unknown error has occurred"

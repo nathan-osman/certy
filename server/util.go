@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"runtime"
 	"strconv"
 	"strings"
 	"time"
@@ -18,6 +19,38 @@ const (
 	durDay  = 24 * time.Hour
 	durYear = 365 * durDay
 )
+
+// When capturing the stack, we need to skip five frames:
+// - runtime.Callers() itself
+// - captureStack()
+// - errorHandler()
+// - Gin's internal recovery function
+// - the call to panic()
+
+func captureStack() string {
+	var (
+		pcs    = make([]uintptr, 64)
+		n      = runtime.Callers(5, pcs)
+		frames = runtime.CallersFrames(pcs[:n])
+		lines  []string
+	)
+	for {
+		f, more := frames.Next()
+		lines = append(
+			lines,
+			fmt.Sprintf(
+				"%s:%d\n\t%s",
+				f.File,
+				f.Line,
+				f.Function,
+			),
+		)
+		if !more {
+			break
+		}
+	}
+	return strings.Join(lines, "\n")
+}
 
 func formatBytes(in *pongo2.Value, param *pongo2.Value) (*pongo2.Value, *pongo2.Error) {
 	v, ok := in.Interface().([]uint8)

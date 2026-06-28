@@ -14,9 +14,18 @@ var (
 	errInvalidFmt = errors.New("invalid format specified")
 )
 
+func (s *Server) e404Handler(c *gin.Context) {
+	c.HTML(http.StatusNotFound, "404.html", pongo2.Context{
+		"title": "Page Not Found",
+		"desc":  "The page you are attempting to view does not exist",
+	})
+}
+
 func (s *Server) errorHandler(c *gin.Context, err any) {
 	msg := "an unknown error has occurred"
 	switch v := err.(type) {
+	case string:
+		msg = v
 	case error:
 		msg = v.Error()
 	}

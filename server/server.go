@@ -202,20 +202,20 @@ func (s *Server) routePath(c *gin.Context) {
 	// Split the path into / [cert] / [action]
 	v := splitPathRegExp.FindStringSubmatch(p)
 	if len(v) < 2 {
-		c.AbortWithStatus(http.StatusNotFound)
+		s.e404Handler(c)
 		return
 	}
 
 	// Check if the action is in the route slice
 	r, ok := s.routes[v[2]]
 	if !ok {
-		c.AbortWithStatus(http.StatusNotFound)
+		s.e404Handler(c)
 		return
 	}
 
 	// Check if the method is allowed
 	if !slices.Contains(r.methods, c.Request.Method) {
-		c.AbortWithStatus(http.StatusMethodNotAllowed)
+		s.errorHandler(c, http.StatusText(http.StatusMethodNotAllowed))
 		return
 	}
 

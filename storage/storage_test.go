@@ -80,15 +80,20 @@ func TestStorageCreatesPersistsExportsAndDeletesCertificates(t *testing.T) {
 		t.Fatalf("get child certificate: %v", err)
 	}
 
-	// Confirm its parents, attributes, & validity
+	// Confirm its parents and attributes
 	if len(childCert.Parents) != 1 || childCert.Parents[0].ID != rootCert.ID {
 		t.Fatalf("child parents = %#v, want root %q", childCert.Parents, rootCert.ID)
 	}
 	if childCert.CanSign() {
 		t.Fatal("leaf certificate should not be able to sign")
 	}
-	if err := s.ValidateCertificate(childCert.Path); err != nil {
-		t.Fatalf("validate child certificate: %v", err)
+
+	// Confirm its validity
+	results, err := s.ValidateCertificate(childCert.Path)
+	for _, r := range results {
+		if r.Err != "" {
+			t.Fatalf("validate certificate chain failed: %v", r.Err)
+		}
 	}
 
 	// Attempt to export the child certificate in PEM format

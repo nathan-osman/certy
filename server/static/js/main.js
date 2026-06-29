@@ -1,5 +1,9 @@
 (function() {
 
+  /**
+   * Handle the dynamic theme switcher and preferences
+   */
+
   const mql = window.matchMedia("(prefers-color-scheme: dark)")
 
   let pref = localStorage.getItem("theme") ?? "auto"
@@ -34,6 +38,25 @@
         localStorage.setItem("theme", pref)
       })
     }
+  })
+
+  /**
+   * Add copy buttons to text on the page that can be copied
+   */
+
+  document.addEventListener("DOMContentLoaded", () => {
+    Array.from(document.getElementsByClassName("copyable")).forEach((el) => {
+      let b = document.createElement('a')
+      b.setAttribute('href', 'javascript:void(0)')
+      b.setAttribute('title', "Copy to clipboard")
+      let i = document.createElement('i')
+      i.classList.add('bi', 'bi-copy')
+      b.appendChild(i)
+      b.addEventListener('click', () => {
+        navigator.clipboard.writeText(el.dataset.value)
+      })
+      el.appendChild(b)
+    })
   })
 
 })()

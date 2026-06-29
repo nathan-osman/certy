@@ -10,7 +10,7 @@
       <tbody>
         <tr>
           <th>SHA-256 fingerprint:</th>
-          <td title="{{ cert.Fingerprint }}">
+          <td class="copyable" data-value="{{ cert.Fingerprint }}">
             {{ cert.Fingerprint|truncatechars:20 }}&mldr;
           </td>
         </tr>

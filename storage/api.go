@@ -84,9 +84,9 @@ func parentList(p *storageCert) []*Ref {
 	for v != nil {
 		parents = append([]*Ref{
 			{
-				ID:   p.id,
-				Path: p.vPath,
-				X509: p.cert,
+				ID:   v.id,
+				Path: v.vPath,
+				X509: v.cert,
 			},
 		}, parents...)
 		v = v.parent

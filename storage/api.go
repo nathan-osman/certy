@@ -136,35 +136,54 @@ func (s *Storage) GetCertificate(certPath string) (*Certificate, error) {
 	return convertCert(c), nil
 }
 
-// ValidateCertificate attempts to validate the specified certificate.
-func (s *Storage) ValidateCertificate(certPath string) error {
+// ValidationResult indicates the validity of a single certificate in a chain
+// represented by Err being nil or not.
+type ValidationResult struct {
+	X509 *x509.Certificate
+	Err  string
+}
+
+// ValidateCertificate attempts to validate the specified certificate. The
+// result is returned as a slice indicating the validity of each link in the
+// chain of trust.
+func (s *Storage) ValidateCertificate(certPath string) ([]*ValidationResult, error) {
 	s.mutex.RLock()
 	defer s.mutex.RUnlock()
 	c, err := s.getCert(certPath)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	var (
-		certs = c.chain()
-		pRoot = x509.NewCertPool()
-		pImed = x509.NewCertPool()
+		results    []*ValidationResult
+		pRoot      = x509.NewCertPool()
+		pImed      = x509.NewCertPool()
+		foundError bool
 	)
-	if len(certs) > 0 {
-		pRoot.AddCert(certs[len(certs)-1].cert)
-		for _, v := range certs[:len(certs)-1] {
-			pImed.AddCert(v.cert)
+	for i, c := range c.chain() {
+		result := &ValidationResult{
+			X509: c.cert,
 		}
-	} else {
-		pRoot.AddCert(c.cert)
+		if i == 0 {
+			pRoot.AddCert(c.cert)
+		}
+		if _, err := c.cert.Verify(x509.VerifyOptions{
+			Roots:         pRoot,
+			Intermediates: pImed,
+			KeyUsages:     []x509.ExtKeyUsage{x509.ExtKeyUsageAny},
+		}); err != nil {
+			if foundError {
+				result.Err = "cannot validate because parent certificate failed to validate"
+			} else {
+				result.Err = err.Error()
+				foundError = true
+			}
+		}
+		results = append(results, result)
+		if i > 0 {
+			pImed.AddCert(c.cert)
+		}
 	}
-	if _, err := c.cert.Verify(x509.VerifyOptions{
-		Roots:         pRoot,
-		Intermediates: pImed,
-		KeyUsages:     []x509.ExtKeyUsage{x509.ExtKeyUsageAny},
-	}); err != nil {
-		return err
-	}
-	return nil
+	return results, nil
 }
 
 // ExportCertificatePEM exports the specified certificate as a PEM-encoded

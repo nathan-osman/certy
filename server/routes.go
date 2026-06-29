@@ -118,20 +118,15 @@ func (s *Server) certNew(c *gin.Context, p string) {
 }
 
 func (s *Server) certValidate(c *gin.Context, p string) {
-	v, err := s.storage.GetCertificate(p)
+	r, err := s.storage.ValidateCertificate(p)
 	if err != nil {
 		panic(err)
 	}
-	var msg string
-	if err := s.storage.ValidateCertificate(v.Path); err != nil {
-		msg = err.Error()
-	}
 	c.HTML(http.StatusOK, "cert_validate.html", pongo2.Context{
-		"title": "Validation Results",
-		"desc":  "The results of your certificate validation are shown below",
-		"cert":  v,
-		"msg":   msg,
-		"page":  "Validation",
+		"title":   "Validation Results",
+		"desc":    "The results of your certificate validation are shown below",
+		"results": r,
+		"page":    "Validation",
 	})
 }
 

@@ -1,26 +1,54 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h4>Verdict</h4>
-<div>
-  {% if msg %}
-    <div class="text-danger">
-      <i class="bi bi-x"></i>
-      <strong>{{ msg }}</strong>
-    </div>
-  {% else %}
-    <div class="text-success">
-      <i class="bi bi-check"></i>
-      <strong>This certificate is valid!</strong>
-      <ul>
-        {% if cert.Parents %}
-          <li>Chain of trust to root certificate</li>
-        {% else %}
-          <li>Is a trusted root certificate</li>
+<div class="row">
+  <div class="col-lg-4 col-sm-6">
+    <div class="d-flex flex-column align-items-center">
+      {% for r in results %}
+        {% if forloop.Counter0 %}
+        <div class="display-6">
+          <i class="bi bi-arrow-down"></i>
+        </div>
         {% endif %}
-        <li>Is not currently expired</li>
-      </ul>
+        {% if r.Err %}
+          {% set border = "border-danger" %}
+        {% else %}
+          {% set border = "border-success" %}
+        {% endif %}
+        <div class="card w-100 my-3 {{ border }}">
+          <div class="d-flex align-items-center">
+            <div class="display-5 ps-2">
+              <i class="bi bi-shield-shaded"></i>
+            </div>
+            <div class="card-body">
+              <h5 class="card-title">{{ r.X509.Subject.CommonName }}</h5>
+              <h6 class="card-subtitle text-body-secondary">
+                {% if !forloop.Counter0 %}
+                  Root Certificate
+                {% elif forloop.Counter == results|length %}
+                  Leaf Certificate
+                {% else %}
+                  Intermediate CA Certificate
+                {% endif %}
+              </h6>
+            </div>
+          </div>
+          <div class="card-footer">
+            {% if r.Err %}
+              <span class="text-danger">
+                <i class="bi bi-x-circle-fill"></i>
+                <strong>Error:</strong> {{ r.Err }}
+              </span>
+            {% else %}
+              <span class="text-success">
+                <i class="bi bi-check-circle-fill"></i>
+                Certificate is valid
+              </span>
+            {% endif %}
+          </div>
+        </div>
+      {% endfor %}
     </div>
-  {% endif %}
+  </div>
 </div>
 {% endblock %}

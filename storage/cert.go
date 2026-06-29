@@ -44,11 +44,11 @@ func (s *storageCert) chain() []*storageCert {
 		cert  = s
 	)
 	for {
-		if cert.parent == nil {
+		certs = append([]*storageCert{cert}, certs...)
+		cert = cert.parent
+		if cert == nil {
 			break
 		}
-		cert = cert.parent
-		certs = append(certs, cert)
 	}
 	return certs
 }

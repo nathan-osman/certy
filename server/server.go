@@ -121,6 +121,20 @@ func New(cfg *Config) (*Server, error) {
 	// Handle errors gracefully
 	r.Use(gin.CustomRecovery(s.errorHandler))
 
+	// Handle 404 page not found
+	r.NoRoute(s.e404Handler)
+
+	// In order to provide URLs of the format:
+	//
+	// / [root] / [intermediate] / [leaf] / [action]
+	//
+	// ...some custom routing logic is required (unfortunately)
+	r.Use(func(c *gin.Context) {
+		if s.routePath(c) {
+			c.Abort()
+		}
+	})
+
 	// Static files (use FS if running in debug)
 	var serveFS static.ServeFileSystem
 	if cfg.Debug {
@@ -133,15 +147,6 @@ func New(cfg *Config) (*Server, error) {
 		serveFS = f
 	}
 	r.Use(static.Serve("/static", serveFS))
-
-	// In order to provide URLs of the format:
-	//
-	// / [root] / [intermediate] / [leaf] / [action]
-	//
-	// ...some custom routing logic is required (unfortunately). This is all
-	// handled in routePath(), which calls the appropriate handler.
-	r.GET("/*path", s.routePath)
-	r.POST("/*path", s.routePath)
 
 	// Populate the route map
 	s.routes = map[string]internalRoute{
@@ -183,44 +188,42 @@ func New(cfg *Config) (*Server, error) {
 	return s, nil
 }
 
-func (s *Server) routePath(c *gin.Context) {
+func (s *Server) routePath(c *gin.Context) bool {
 
-	p := c.Param("path")
+	p := c.Request.URL.Path
 
 	// Show the home page for GET /
 	if p == "/" && c.Request.Method == http.MethodGet {
 		s.index(c)
-		return
+		return true
 	}
 
 	// Page for creating new root certificates
 	if p == "/new" && slices.Contains(methodsGetPost, c.Request.Method) {
 		s.certNew(c, "")
-		return
+		return true
 	}
 
 	// Split the path into / [cert] / [action]
 	v := splitPathRegExp.FindStringSubmatch(p)
 	if len(v) < 2 {
-		s.e404Handler(c)
-		return
+		return false
 	}
 
 	// Check if the action is in the route slice
 	r, ok := s.routes[v[2]]
 	if !ok {
-		s.e404Handler(c)
-		return
+		return false
 	}
 
 	// Check if the method is allowed
 	if !slices.Contains(r.methods, c.Request.Method) {
-		s.errorHandler(c, http.StatusText(http.StatusMethodNotAllowed))
-		return
+		return false
 	}
 
 	// Route the request
 	r.handler(c, v[1])
+	return true
 }
 
 // Close shuts down the server.

@@ -9,53 +9,42 @@
 {% endif %}
 
 <div class="row g-4 mb-4">
-  <div class="col-md-8">
-    <div class="card">
-      <div class="card-header">Information</div>
+  <div class="col-md-4">
+    <div class="card h-100">
+      <div class="card-header">Basic</div>
       <div class="card-body">
         {{ input(form, "CommonName", "Common name", placeholder, true, true) }}
-        {{ input(form, "Organization", "Organization", "e.g. Your Name or MyCompany Ltd.") }}
-        {{ input(form, "OrganizationalUnit", "Organizational unit", "e.g. Research Division") }}
-        <div class="row">
-          <div class="col-md-4">
-            {{ input(form, "Country", "Country code", "e.g. US, CA, etc.") }}
-          </div>
-          <div class="col-md-4">
-            {{ input(form, "Province", "Province or State", "e.g. Alberta, Alaska, etc.") }}
-          </div>
-          <div class="col-md-4">
-            {{ input(form, "Locality", "City", "e.g. Atlanta, Toronto, etc.") }}
-          </div>
-          <div class="col-md-8">
-            {{ input(form, "StreetAddress", "Street address", "e.g. 1234 Park Way") }}
-          </div>
-          <div class="col-md-4">
-            {{ input(form, "PostalCode", "Postal or zip code", "e.g. 12345") }}
-          </div>
-        </div>
+        {{ duration(form, "Validity", "Validity", true) }}
       </div>
     </div>
   </div>
   <div class="col-md-4">
-    <div class="d-grid gap-4">
-      <div class="card">
-        <div class="card-header">Validity & Usage</div>
-        <div class="card-body">
-          {{ duration(form, "Validity", "Validity", true) }}
-          {% if !cert.Parents || cert.X509.MaxPathLen %}
-            {{ checkbox(form, "CanSign", "Can sign certificates (Certificate Authority)") }}
-            {{ checkbox(form, "AllowChaining", "Allow chaining (signing intermediates)")}}
-          {% endif %}
-          {{ checkbox(form, "CodeSigning", "Code signing")}}
-          {{ checkbox(form, "ClientAuth", "Client auth")}}
-          {{ checkbox(form, "ServerAuth", "Server auth")}}
-        </div>
+    <div class="card h-100">
+      <div class="card-header">Extensions</div>
+      <div class="card-body">
+        {{ domains(form, "SANs", "SANs (Subject Alternative Names)") }}
+        <div class="h6">Key Usage</div>
+        {% if !cert.Parents || cert.X509.MaxPathLen %}
+          {{ checkbox(form, "CanSign", "Can sign certificates (Certificate Authority)") }}
+          {{ checkbox(form, "AllowChaining", "Allow chaining (signing intermediates)")}}
+        {% endif %}
+        {{ checkbox(form, "CodeSigning", "Code signing")}}
+        {{ checkbox(form, "ClientAuth", "Client auth")}}
+        {{ checkbox(form, "ServerAuth", "Server auth")}}
       </div>
-      <div class="card">
-        <div class="card-header">Extensions</div>
-        <div class="card-body">
-          {{ domains(form, "SANs", "SANs (Subject Alternative Names)") }}
-        </div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card h-100">
+      <div class="card-header">Optional Information</div>
+      <div class="card-body">
+        {{ input(form, "Organization", "Organization", "e.g. Your Name or MyCompany Ltd.") }}
+        {{ input(form, "OrganizationalUnit", "Organizational unit", "e.g. Research Division") }}
+        {{ input(form, "Country", "Country code", "e.g. US, CA, etc.") }}
+        {{ input(form, "Province", "Province or State", "e.g. Alberta, Alaska, etc.") }}
+        {{ input(form, "Locality", "City", "e.g. Atlanta, Toronto, etc.") }}
+        {{ input(form, "StreetAddress", "Street address", "e.g. 1234 Park Way") }}
+        {{ input(form, "PostalCode", "Postal or zip code", "e.g. 12345") }}
       </div>
     </div>
   </div>

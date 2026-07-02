@@ -1,20 +1,22 @@
-<ol class="breadcrumb">
-  <li class="breadcrumb-item"><i class="bi bi-house-fill"></i></li>
-  {% for c in cert.Parents %}
-    <li class="breadcrumb-item">
-      <a href="/{{ c.Path }}">
-        {{ c.X509.Subject.CommonName }}
-      </a>
-    </li>
-  {% endfor %}
-  {% if page %}
-    <li class="breadcrumb-item">
-      <a href="/{{ cert.Path }}">
-        {{ cert.X509.Subject.CommonName }}
-      </a>
-    </li>
-    <li class="breadcrumb-item active">{{ page }}</li>
-  {% else %}
-    <li class="breadcrumb-item active">{{ cert.X509.Subject.CommonName }}</li>
-  {% endif %}
-</ol>
+<div class="mb-4">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><i class="bi bi-house-fill"></i></li>
+    {% for c in cert.Parents %}
+      <li class="breadcrumb-item">
+        <a href="/{{ c.Path }}">
+          {{ c.X509.Subject.CommonName }}
+        </a>
+      </li>
+    {% endfor %}
+    {% if page %}
+      <li class="breadcrumb-item">
+        <a href="/{{ cert.Path }}">
+          {{ cert.X509.Subject.CommonName }}
+        </a>
+      </li>
+      <li class="breadcrumb-item active">{{ page }}</li>
+    {% else %}
+      <li class="breadcrumb-item active">{{ cert.X509.Subject.CommonName }}</li>
+    {% endif %}
+  </ol>
+</div>

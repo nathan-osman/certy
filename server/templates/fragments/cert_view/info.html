@@ -48,6 +48,14 @@
             {% if cert.X509.IsCA %}yes{% else %}no{% endif %}
           </td>
         </tr>
+        {% if cert.PrivateKey %}
+          <tr>
+            <th>Key size:</th>
+            <td>
+              {{ cert.PrivateKey.Size }} bits
+            </td>
+          </tr>
+        {% endif %}
         <tr>
           <th>Key usage:</th>
           <td>

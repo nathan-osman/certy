@@ -15,6 +15,7 @@
       <div class="card-body">
         {{ input(form, "CommonName", "Common name", placeholder, true, true) }}
         {{ duration(form, "Validity", "Validity", true) }}
+        {{ input(form, "KeySize", "Key size", "e.g. 2048", true, false, "", "number") }}
       </div>
     </div>
   </div>

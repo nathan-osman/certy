@@ -1,6 +1,7 @@
 package storage
 
 import (
+	"crypto/rsa"
 	"crypto/x509"
 	"crypto/x509/pkix"
 	"encoding/pem"
@@ -23,6 +24,11 @@ type Ref struct {
 	X509 *x509.Certificate
 }
 
+// Private key holds information about a certificate's private key.
+type PrivateKey struct {
+	Size int
+}
+
 // Certificate represents an X.509 certificate in a format suitable for
 // rendering to templates.
 type Certificate struct {
@@ -32,7 +38,7 @@ type Certificate struct {
 	Fingerprint string
 	X509        *x509.Certificate
 	Children    []*Ref
-	HasKey      bool
+	PrivateKey  *PrivateKey
 }
 
 // IsExpired indicates whether the certificate is expired or not.
@@ -50,7 +56,7 @@ func (c *Certificate) MaySign() bool {
 // CanSign indicates whether this certificate has the ability to sign others
 // (a private key exists on disk).
 func (c *Certificate) CanSign() bool {
-	return c.MaySign() && c.HasKey
+	return c.MaySign() && c.PrivateKey != nil
 }
 
 // KeyUsage provides a human-friendly list of possible uses.
@@ -106,16 +112,21 @@ func childList(m map[string]*storageCert) []*Ref {
 	return children
 }
 
-func convertCert(cert *storageCert) *Certificate {
-	return &Certificate{
+func convertCert(cert *storageCert, key *rsa.PrivateKey) *Certificate {
+	c := &Certificate{
 		ID:          cert.id,
 		Path:        cert.vPath,
 		Parents:     parentList(cert.parent),
 		Fingerprint: cert.fingerprint,
 		X509:        cert.cert,
 		Children:    childList(cert.children),
-		HasKey:      cert.hasKey,
 	}
+	if key != nil {
+		c.PrivateKey = &PrivateKey{
+			Size: key.Size() * 8,
+		}
+	}
+	return c
 }
 
 // GetRootCertificates returns the root certificates.
@@ -133,7 +144,15 @@ func (s *Storage) GetCertificate(certPath string) (*Certificate, error) {
 	if err != nil {
 		return nil, err
 	}
-	return convertCert(c), nil
+	var key *rsa.PrivateKey
+	if c.hasKey {
+		k, err := loadPrivateKey(filepath.Join(c.fPath, filenamePrivateKey))
+		if err != nil {
+			return nil, err
+		}
+		key = k
+	}
+	return convertCert(c, key), nil
 }
 
 // ValidationResult indicates the validity of a single certificate in a chain
@@ -346,6 +365,7 @@ type CreateCertificateParams struct {
 	ClientAuth         bool
 	ServerAuth         bool
 	SANs               string
+	KeySize            int
 }
 
 // CreateCertificate creates a new certificate & private key. The newly
@@ -389,7 +409,10 @@ func (s *Storage) CreateCertificate(
 	}
 
 	// Generate a new private key
-	k, err := generatePrivateKey(filepath.Join(d, filenamePrivateKey))
+	k, err := generatePrivateKey(
+		filepath.Join(d, filenamePrivateKey),
+		params.KeySize,
+	)
 	if err != nil {
 		return nil, err
 	}
@@ -533,7 +556,7 @@ func (s *Storage) CreateCertificate(
 	}
 
 	// Return the new certificate
-	return convertCert(c), nil
+	return convertCert(c, k), nil
 }
 
 // DeleteCertificate removes a certificate and its private key from disk. Note

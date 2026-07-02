@@ -1,5 +1,5 @@
 {# Display a text input #}
-{% macro input(form, name, label, placeholder="", required=false, autofocus=false, help="") export %}
+{% macro input(form, name, label, placeholder="", required=false, autofocus=false, help="", type="text") export %}
   {% if autofocus %}
     {% set autofocus = "autofocus" %}
   {% else %}
@@ -13,7 +13,7 @@
       {% endif %}
     </label>
     <input
-      type="text"
+      type="{{ type }}"
       name="{{ name }}"
       id="{{ name }}"
       placeholder="{{ placeholder }}"

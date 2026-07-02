@@ -62,7 +62,9 @@ func (s *Server) certView(c *gin.Context, p string) {
 func (s *Server) certNew(c *gin.Context, p string) {
 	var (
 		cert *storage.Certificate
-		form = &storage.CreateCertificateParams{}
+		form = &storage.CreateCertificateParams{
+			KeySize: 2048,
+		}
 	)
 	if p != "" {
 		v, err := s.storage.GetCertificate(p)

@@ -21,8 +21,8 @@ var (
 	errNotAnRSAKey    = errors.New("file is not an RSA private key")
 )
 
-func generatePrivateKey(filename string) (*rsa.PrivateKey, error) {
-	p, err := rsa.GenerateKey(rand.Reader, 2048)
+func generatePrivateKey(filename string, bits int) (*rsa.PrivateKey, error) {
+	p, err := rsa.GenerateKey(rand.Reader, bits)
 	if err != nil {
 		return nil, err
 	}

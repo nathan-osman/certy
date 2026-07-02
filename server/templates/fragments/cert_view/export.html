@@ -9,7 +9,7 @@
       {% if cert.Parents|length > 1 %}
         {{ m_export(cert.Path, "chain_pem", "Certificate chain (PEM)") }}
       {% endif %}
-      {% if cert.HasKey %}
+      {% if cert.PrivateKey %}
         <a href="/{{ cert.Path }}/pkcs12" class="btn btn-primary">
           PKCS#12
         </a>

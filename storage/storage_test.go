@@ -36,6 +36,7 @@ func TestStorageCreatesPersistsExportsAndDeletesCertificates(t *testing.T) {
 		Validity:      "1h",
 		CanSign:       true,
 		AllowChaining: true,
+		KeySize:       2048,
 	})
 	if err != nil {
 		t.Fatalf("create root certificate: %v", err)
@@ -69,6 +70,7 @@ func TestStorageCreatesPersistsExportsAndDeletesCertificates(t *testing.T) {
 		Validity:   "30m",
 		ServerAuth: true,
 		SANs:       childCertCN + " " + childCertIP,
+		KeySize:    2048,
 	})
 	if err != nil {
 		t.Fatalf("create child certificate: %v", err)
